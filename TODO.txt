@@ -4,6 +4,8 @@ Options
         - physics
             - vel
             - spin
+            - unbreakable
+            - spears no collide
         - impaling
             - depth
             - materials
@@ -14,3 +16,5 @@ Options
 
     - Other
         - hitmarker
+        - sound sets
+            - yeet

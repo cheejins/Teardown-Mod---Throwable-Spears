@@ -1,6 +1,7 @@
 function modReset()
 
-    regSetFloat('spear.velocity'    , 120)
+    regSetFloat('spears.velocity'   , 120)
+    regSetBool('spears.impaling'    , true)
 
 end
 
@@ -29,4 +30,3 @@ function regSetBool(path, value)
     local p = 'savegame.mod.' .. path
     SetBool(p, value)
 end
-
