@@ -1,0 +1,16 @@
+Options
+
+    - Spear
+        - physics
+            - vel
+            - spin
+        - impaling
+            - depth
+            - materials
+            - force
+
+    - Modes
+        - From above
+
+    - Other
+        - hitmarker
