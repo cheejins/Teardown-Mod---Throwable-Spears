@@ -13,7 +13,6 @@ Options
             - force
 
     - Modes
-
         - Constant vel
             - From above straight down
             - Turret Mode
@@ -21,7 +20,6 @@ Options
                 - no collide spear with body
         - Charge up
             - Overhead (slightly above and towards raycast hit)
-
 
     - Other
         - hitmarker

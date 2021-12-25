@@ -287,7 +287,7 @@ end
         if value > ma then value = ma end
         return value
     end
-    function oscillate(time)
+    function oscillateTime(time)
         local a = (GetTime() / (time or 1)) % 1
         a = a * math.pi
         return math.sin(a)

@@ -14,29 +14,110 @@ function uiDrawOptions()
     local w = UiWidth()
     local h = UiHeight()
 
+    local cont_w = 1400
+    local cont_h = 1000
+
     do UiPush()
 
         UiColor(1,1,1, 1)
         UiFont('bold.ttf', 24)
         UiAlign('center middle')
 
-        marginYSize = 50
+        marginYSize = 80
         local marginY = 0
 
         do UiPush()
-
             UiTranslate(UiCenter(), UiMiddle())
+            UiColor(0,0,0, 0.75)
+            UiRect(cont_w, cont_h)
+        UiPop() end
+
+        do UiPush()
+            UiTranslate(UiCenter(), 100)
+            UiFont('bold.ttf', 72)
+            UiText('Spear Options')
+        UiPop() end
+
+        do UiPush()
+
+            UiTranslate(UiCenter()-350, 250)
 
             do UiPush()
-                UiColor(0,0,0, 0.75)
-                UiRect(700, 200)
-            UiPop() end
 
-            do UiPush()
+                -- do UiPush()
+                --     -- UiTranslate(-350 + 94, 0)
+                --     -- UiAlign('left middle')
+                --     UiFont('bold.ttf', 48)
+                --     UiText('Physics')
+                -- UiPop() end
+                -- UiTranslate(0, marginYSize)
+                -- marginY = marginY + marginYSize
 
                 UiTranslate(-250, 0)
 
-                ui.slider.create('Spear Velocity', 'spears.velocity', 'm/s', 1, 500)
+                -- Velocity
+                ui.slider.create('Velocity', 'spears.velocity', 'm/s', 1, SPEARS.velocityMax)
+                UiTranslate(0, marginYSize)
+                marginY = marginY + marginYSize
+
+                -- Velocity Max
+                ui.slider.create('Max Velocity', 'spears.velocityMax', 'm/s', 1, 500)
+                UiTranslate(0, marginYSize)
+                marginY = marginY + marginYSize
+
+                -- Sharpness
+                ui.slider.create('Sharpness', 'spears.sharpness', '%', 0, 100)
+                UiTranslate(0, marginYSize)
+                marginY = marginY + marginYSize
+
+                -- Force Multiplier
+                ui.slider.create('Force Multiplier', 'spears.forceMultiplier', '', 0, 10)
+                UiTranslate(0, marginYSize)
+                marginY = marginY + marginYSize
+
+                -- Throw Height
+                ui.slider.create('Extra Throw Height', 'spears.extraThrowHeight', 'meters', 0, 5)
+                UiTranslate(0, marginYSize)
+                marginY = marginY + marginYSize
+
+                ui.checkBox.create('Impaling', 'spears.impaling')
+                UiTranslate(0, marginYSize)
+                marginY = marginY + marginYSize
+
+            UiPop() end
+
+        UiPop() end
+
+        do UiPush()
+
+            UiTranslate(UiCenter()+350, 250)
+
+            do UiPush()
+
+                -- do UiPush()
+                --     -- UiTranslate(-350 + 94, 0)
+                --     -- UiAlign('left middle')
+                --     UiFont('bold.ttf', 48)
+                --     UiText('Misc')
+                -- UiPop() end
+                -- UiTranslate(0, marginYSize)
+                -- marginY = marginY + marginYSize
+
+                UiTranslate(-250, 0)
+
+                ui.slider.create('Velocity', 'spears.velocity', 'm/s', 1, 500)
+                UiTranslate(0, marginYSize)
+                marginY = marginY + marginYSize
+
+                ui.slider.create('Sharpness', 'spears.sharpness', '%', 0, 100)
+                UiTranslate(0, marginYSize)
+                marginY = marginY + marginYSize
+
+                ui.slider.create('Force Multiplier', 'spears.forceMultiplier', '', 0, 10)
+                UiTranslate(0, marginYSize)
+                marginY = marginY + marginYSize
+
+                ui.slider.create('Extra Throw Height', 'spears.extraThrowHeight', 'meters', 0, 5)
                 UiTranslate(0, marginYSize)
                 marginY = marginY + marginYSize
 
@@ -54,7 +135,7 @@ function uiDrawOptions()
             local closeW = 80
             local wAlign = (resetW + closeW) / 2
 
-            UiTranslate(UiCenter()-wAlign, UiMiddle() + 150)
+            UiTranslate(UiCenter()-wAlign, cont_h)
 
             UiAlign('center middle')
             UiImageBox("ui/common/box-outline-fill-6.png", closeW, 50, 10, 10)
@@ -103,7 +184,7 @@ ui.colors = {
 
 ui.slider = {}
 
-function ui.slider.create(title, registryPath, valueText, min, max, w, h, fontSize, axis)
+function ui.slider.create(title, registryPath, valueText, min, max, w, h, fontSize, dec)
 
     local value = GetFloat('savegame.mod.' .. registryPath)
 
@@ -148,8 +229,8 @@ function ui.slider.create(title, registryPath, valueText, min, max, w, h, fontSi
         do UiPush()
             UiAlign('left middle')
             UiTranslate(slW + 20, 0)
-            local decimals = ternary((value/slW) * (max-min) + min < 100, 3, 1)
-            UiText(sfn((value/slW) * (max-min) + min, decimals) .. ' ' .. (valueText))
+            local decimals = ternary((value/slW) * (max-min) + min <= 100, 2, 0)
+            UiText(sfn((value/slW) * (max-min) + min, dec or decimals) .. ' ' .. (valueText))
         UiPop() end
 
     UiPop() end
@@ -162,15 +243,17 @@ ui.checkBox = {}
 
 function ui.checkBox.create(title, registryPath)
 
+    UiTranslate(0, -font_normal*0.35)
+
     local value = GetBool('savegame.mod.' .. registryPath)
 
-    UiAlign('left middle')
-
     -- Text header
+    UiAlign('left top')
     UiColor(1,1,1, 1)
-    UiFont('regular.ttf', fontSize or font_normal)
+    UiFont('regular.ttf', font_normal)
     UiText(title)
-    UiTranslate(0, fontSize or font_normal)
+    UiRect(4,4)
+    UiTranslate(0, font_normal * 1.2 )
 
     -- Toggle BG
     UiAlign('left top')
@@ -209,5 +292,7 @@ function ui.checkBox.create(title, registryPath)
         SetBool('savegame.mod.' .. registryPath, not value)
         PlaySound(LoadSound('clickdown.ogg'), GetCameraTransform().pos, 1)
     end
+
+    UiTranslate(0, font_normal*0.5)
 
 end
