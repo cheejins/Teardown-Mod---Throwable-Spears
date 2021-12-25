@@ -1,6 +1,6 @@
 function modReset()
 
-    regSetFloat('spears.velocity'   , 120)
+    regSetFloat('spears.velocity'   , 70)
     regSetBool('spears.impaling'    , true)
 
 end

@@ -12,7 +12,11 @@ Options
             - force
 
     - Modes
-        - From above
+        - From above straight down
+        - Overhead (slightly above and towards raycast hit)
+        - Turret Mode
+            - Shoot souce = body rel pos
+            - no collide spear with body
 
     - Other
         - hitmarker

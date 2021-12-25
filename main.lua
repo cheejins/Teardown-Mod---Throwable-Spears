@@ -21,6 +21,8 @@ function tick()
     convertPipebombs()
     processSpears()
 
+    debugMod()
+
 end
 
 function draw()

@@ -40,6 +40,10 @@ function uiDrawOptions()
                 UiTranslate(0, marginYSize)
                 marginY = marginY + marginYSize
 
+                ui.checkBox.create('Impaling', 'spears.impaling')
+                UiTranslate(0, marginYSize)
+                marginY = marginY + marginYSize
+
             UiPop() end
 
         UiPop() end
@@ -75,8 +79,6 @@ end
 
 --- Manage when to open and close the options menu.
 function uiManageGameOptions()
-
-    if InputPressed('rmb') then UI_OPTIONS = not UI_OPTIONS end
 
     if UI_OPTIONS then
         UiMakeInteractive()

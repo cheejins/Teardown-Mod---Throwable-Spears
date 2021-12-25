@@ -8,9 +8,11 @@ end
 
 
 function updateSpears()
+
     SPEARS.velocity = regGetFloat('spears.velocity')
-    -- SPEARS.impaling = regGetBool('spears.impaling')
-    SPEARS.impaling = true
+    SPEARS.impaling = regGetBool('spears.impaling')
+    -- SPEARS.overheadThrow = regGetBool('spears.overheadThrow')
+
 end
 
 
@@ -22,15 +24,33 @@ do
         for key, spear in pairs(ActiveSpears) do
 
             if SPEARS.impaling then
+
                 -- local tr = GetShapeWorldTransform(spear.shape)
                 local tr = GetBodyTransform(spear.body)
 
+                -- Tip pos of the spear.
                 local x,y,z = GetShapeSize(spear.shape)
-                local tipPos = TransformToParentPoint(tr, Vec(0, 0, -y-1.3))
+                local tipPos = TransformToParentPoint(tr, Vec(0, 0, -y-1.2))
+                spear.tipPos = tipPos
 
-                -- local totalVel = VecLength(GetBodyVelocity(spear.body))
+                -- Bodies near tip
+                local aabbOffset = Vec(0.2, 0.2, 0.2)
+                local tipMin = VecAdd(tipPos, aabbOffset)
+                local tipMax = VecAdd(tipPos, VecScale(aabbOffset, -1))
+                QueryRejectBody(spear.body)
+                local hitShapes = QueryAabbBodies(tipMin, tipMax)
+
+                for index, shape in ipairs(hitShapes) do
+                    local body = GetShapeBody(shape)
+                    impaleSpear(spear, body)
+                end
+
+                -- Impale (spear tip cuts through voxels easier)
+                -- MakeHole(tipPos, (x+z)/2, (x+z)/2, (x+z)/2, (x+z)/2)
                 MakeHole(tipPos, 0.3, 0.3, 0.3, 0.3)
-                -- DebugCross(tipPos, 1,1,1, 1)
+
+                AabbDraw(tipMin, tipMax)
+                dbcr(tipPos, 1,1,1, 1)
             end
 
         end
@@ -48,6 +68,7 @@ do
             -- if GetShapeVoxelCount(shape) == 21 then
                 RemoveTag(shape,'bomb')
                 RemoveTag(shape,'smoke')
+                SetTag(shape,'unbreakable')
             -- end
 
             local bodyTrSpear = TransformCopy(GetCameraTransform())
@@ -55,8 +76,18 @@ do
             setSpearSpawn(body, bodyTrSpear)
 
             local spear = {
+
                 body = body,
-                shape = shape
+                shape = shape,
+
+                impaling = {
+
+                    impaled = false,
+
+                    impaleBody = nil,
+                    impaleAttachBody = nil,
+
+                }
             }
 
             table.insert(ActiveSpears, spear)
@@ -70,7 +101,20 @@ do
         SetBodyAngularVelocity(spearBody, Vec(0,0,0))
     end
 
-    function impaleSpear(spear)
+    function impaleSpear(spear, body)
+
+        local spearVel = GetBodyVelocity(spear.body)
+        local spearImpulse = VecScale(spearVel, 100)
+        -- local bodyTr = GetBodyTransform(body)
+
+        ApplyBodyImpulse(body, spear.tipPos, spearImpulse)
+
+        -- if not spear.impaling.impaled then
+        --     spear.impaling.impaled = true
+        -- end
+
+        beep()
+
     end
 
     -- Process the hit of an impalement.
@@ -87,21 +131,36 @@ do
     function deleteSpears()
         for key, value in pairs(ActiveSpears) do
             Delete(value.body)
+            ActiveSpears[key] = nil
         end
     end
 
     function processInput()
 
-        if InputPressed('r') and GetString('game.player.tool') == 'pipebomb' then
+        local isUsingTool = GetString('game.player.tool') == 'pipebomb'
+
+        --> Delete all spears.
+        if InputPressed('r') and isUsingTool then
             deleteSpears()
             beep()
-         end
+        end
 
-         if InputPressed('z') and GetString('game.player.tool') == 'pipebomb' then
-             Delete(ActiveSpears[#ActiveSpears].body)
-             ActiveSpears[#ActiveSpears] = nil
-         end
+        --> Delete/undo last spear created.
+        if InputPressed('z') and isUsingTool then
+            Delete(ActiveSpears[#ActiveSpears].body)
+            ActiveSpears[#ActiveSpears] = nil
+        end
 
+        --> Toggle options UI.
+        if InputPressed('rmb') and isUsingTool then
+            UI_OPTIONS = not UI_OPTIONS
+        end
+
+
+    end
+
+    function debugMod()
+        dbw('#ActiveSpears', #ActiveSpears)
     end
 
 end
