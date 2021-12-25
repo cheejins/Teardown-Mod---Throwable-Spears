@@ -23,33 +23,42 @@ do
 
         for key, spear in pairs(ActiveSpears) do
 
-            if SPEARS.impaling then
+            if SPEARS.impaling and spear.impaling.impales < spear.impaling.impaleTicks then
 
                 -- local tr = GetShapeWorldTransform(spear.shape)
                 local tr = GetBodyTransform(spear.body)
 
                 -- Tip pos of the spear.
                 local x,y,z = GetShapeSize(spear.shape)
-                local tipPos = TransformToParentPoint(tr, Vec(0, 0, -y-1.2))
+                local tipPos = TransformToParentPoint(tr, Vec(0, 0, -y-1))
                 spear.tipPos = tipPos
 
                 -- Bodies near tip
-                local aabbOffset = Vec(0.2, 0.2, 0.2)
+                local aabbOffset = Vec(0.4, 0.4, 0.4)
                 local tipMin = VecAdd(tipPos, aabbOffset)
                 local tipMax = VecAdd(tipPos, VecScale(aabbOffset, -1))
                 QueryRejectBody(spear.body)
-                local hitShapes = QueryAabbBodies(tipMin, tipMax)
+                local hitBodies = QueryAabbBodies(tipMin, tipMax)
 
-                for index, shape in ipairs(hitShapes) do
-                    local body = GetShapeBody(shape)
-                    impaleSpear(spear, body)
+                local aabbColor = Vec(1,1,1)
+
+                for index, body in ipairs(hitBodies) do
+
+                    if body ~= GlobalBody then
+                        aabbColor = Vec(1,0,0)
+                        DrawBodyOutline(body, 1,0,0,1)
+                        impaleSpear(spear, body) -- Impale bodies at the tip of the spear.
+                    end
+
                 end
+
+                spear.impaling.impales = spear.impaling.impales + 1
 
                 -- Impale (spear tip cuts through voxels easier)
                 -- MakeHole(tipPos, (x+z)/2, (x+z)/2, (x+z)/2, (x+z)/2)
-                MakeHole(tipPos, 0.3, 0.3, 0.3, 0.3)
+                MakeHole(tipPos, 0.4, 0.4, 0.4, 0.4)
 
-                AabbDraw(tipMin, tipMax)
+                AabbDraw(tipMin, tipMax, aabbColor[1], aabbColor[2], aabbColor[3])
                 dbcr(tipPos, 1,1,1, 1)
             end
 
@@ -82,7 +91,8 @@ do
 
                 impaling = {
 
-                    impaled = false,
+                    impales = 0,
+                    impaleTicks = 10, -- Impale for this many ticks after the tip hits an object.
 
                     impaleBody = nil,
                     impaleAttachBody = nil,
@@ -95,25 +105,15 @@ do
 
     end
 
-    function setSpearSpawn(spearBody, tr, vel)
-        SetBodyTransform(spearBody, tr)
-        SetBodyVelocity(spearBody, VecScale(QuatToDir(QuatLookAt(tr.pos, TransformToParentPoint(tr, Vec(0,0,-1)))), SPEARS.velocity))
-        SetBodyAngularVelocity(spearBody, Vec(0,0,0))
-    end
-
     function impaleSpear(spear, body)
 
         local spearVel = GetBodyVelocity(spear.body)
-        local spearImpulse = VecScale(spearVel, 100)
-        -- local bodyTr = GetBodyTransform(body)
 
-        ApplyBodyImpulse(body, spear.tipPos, spearImpulse)
+        local spearImpulse = VecScale(spearVel, GetBodyMass(spear.body)/GetBodyMass(body))
+        -- local spearImpulse = VecScale(spearVel, 0.5)
 
-        -- if not spear.impaling.impaled then
-        --     spear.impaling.impaled = true
-        -- end
-
-        beep()
+        -- ApplyBodyImpulse(body, spear.tipPos, spearImpulse)
+        SetBodyVelocity(body, spearImpulse)
 
     end
 
@@ -127,6 +127,12 @@ end
 
 -- OTHER
 do
+
+    function setSpearSpawn(spearBody, tr, vel)
+        SetBodyTransform(spearBody, tr)
+        SetBodyVelocity(spearBody, VecScale(QuatToDir(QuatLookAt(tr.pos, TransformToParentPoint(tr, Vec(0,0,-1)))), SPEARS.velocity))
+        SetBodyAngularVelocity(spearBody, Vec(0,0,0))
+    end
 
     function deleteSpears()
         for key, value in pairs(ActiveSpears) do

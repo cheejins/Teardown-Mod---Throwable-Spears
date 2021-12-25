@@ -6,6 +6,8 @@
 
 function init()
 
+    GlobalBody = FindBodies('', true)[1]
+
     checkRegInitialized()
     initUi()
 
