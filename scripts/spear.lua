@@ -9,7 +9,7 @@ function initSpears()
     SPEARS.velocitySign = 1
     SPEARS.velocityCharge = regGetFloat('spears.velocity')
 
-    SPEARS.modes = {straight = 'straight', flat = 'flat', rain = 'rain'}
+    SPEARS.modes = {straight = 'Straight', flat = 'Flat', rain = 'Rain'}
     SPEARS.mode = SPEARS.modes.straight
 
 end

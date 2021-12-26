@@ -134,11 +134,6 @@ function uiDrawOptions()
                 UiTranslate(0, marginYSize)
                 marginY = marginY + marginYSize
 
-                -- -- Throw Height
-                -- ui.slider.create('Extra Throw Height', 'spears.extraThrowHeight', 'meters', 0, 5)
-                -- UiTranslate(0, marginYSize)
-                -- marginY = marginY + marginYSize
-
             UiPop() end
 
         UiPop() end
@@ -161,34 +156,15 @@ function uiDrawOptions()
                     UiTranslate(0, marginYSize)
                     marginY = marginY + marginYSize
 
-                    -- ui.checkBox.create('Spear Rain', 'spears.rain')
-                    -- UiTranslate(0, marginYSize)
-                    -- marginY = marginY + marginYSize
-
-                    -- ui.checkBox.create('Throw Spears Flat', 'spears.throwFlat')
-                    -- UiTranslate(0, marginYSize)
-                    -- marginY = marginY + marginYSize
-
-                UiPop() end
-
-
-                do UiPush()
-
-                    UiTranslate(50, 0)
-
                     ui.checkBox.create('Spear Tip Light', 'spears.tipLight')
                     UiTranslate(0, marginYSize)
                     marginY = marginY + marginYSize
 
-                    ui.checkBox.create('Hit Marker', 'spears.hitMarker')
+                    ui.checkBox.create('Yeet', 'spears.yeetMode')
                     UiTranslate(0, marginYSize)
                     marginY = marginY + marginYSize
 
-                    ui.checkBox.create('YEET MODE', 'spears.yeetMod')
-                    UiTranslate(0, marginYSize)
-                    marginY = marginY + marginYSize
-
-                    UiPop() end
+                UiPop() end
 
             UiPop() end
 
@@ -247,111 +223,134 @@ function drawSpearQuickOptions()
         UiTranslate(0, -100)
 
         do UiPush()
-            UiTranslate(UiCenter(), UiMiddle()+100)
+
+            -- BG
+            UiTranslate(UiCenter(), UiMiddle()-200)
             UiColor(0,0,0, 0.5)
-            UiRect(1000, 400)
-        UiPop() end
+            UiRect(400, 200)
 
-        do UiPush()
+            UiTranslate(-50, 0)
+
             UiColor(1,1,1, 1)
+            UiAlign('right middle')
             UiImageBox('MOD/img/mouse_lmb.png', 100,100, 1,1)
-        UiPop() end
 
-        UiTranslate(-250, 0)
-
-        -- Spear velocity
-        do UiPush()
-
-            local sliderWidth = 400
-            local velocityFactor = SPEARS.velocityMax/gtZero(SPEARS.velocity)
-
-            UiTranslate(UiCenter(), UiMiddle())
-            UiText('Speed')
-
-            UiFont('bold.ttf', 48)
+            UiAlign('center top')
+            UiTranslate(100, -40)
+            UiText('Throw Mode:')
             UiTranslate(0, 48)
-            UiText(sfn(SPEARS.velocity,0) .. ' m/s')
-
-            UiAlign('left middle')
-            UiTranslate(-sliderWidth/2, 48)
-
-            UiColor(0,0,0, 1)
-            do UiPush()
-                UiTranslate(-4,0)
-                UiRect(sliderWidth+8, 36)
-            UiPop() end
-
-            UiColor(1, 1 - 1/velocityFactor, 1 - 1/velocityFactor, 1)
-            UiRect(sliderWidth / velocityFactor, 28)
-
-            -- Mouse image
-            do UiPush()
-                UiAlign('center middle')
-                UiColor(1,1,1, 1)
-                UiTranslate(sliderWidth/2, 96)
-                UiImageBox('MOD/img/mouse.png', 100,100, 1,1)
-
-                do UiPush()
-                    UiTranslate(100, 0)
-                    UiImageBox('MOD/img/arrow_right.png', 100,100, 1,1)
-                UiPop() end
-                do UiPush()
-                    UiTranslate(-100, 0)
-                    UiImageBox('MOD/img/arrow_left.png', 100,100, 1,1)
-                UiPop() end
-
-            UiPop() end
+            UiText(SPEARS.mode)
 
         UiPop() end
 
-        UiTranslate(500, 0)
+        do
 
-        -- Spear force
-        do UiPush()
+            UiTranslate(0, 50)
 
-            local sliderWidth = 400
-            local forceFactor = SPEARS.forceMultiplierMax/gtZero(SPEARS.forceMultiplier)
-
-            UiTranslate(UiCenter(), UiMiddle())
-            UiText('Force Multiplier')
-
-            UiFont('bold.ttf', 48)
-            UiTranslate(0, 48)
-            UiText(sfn(SPEARS.forceMultiplier,1)*100 .. ' %')
-
-            UiAlign('left middle')
-            UiTranslate(-sliderWidth/2, 48)
-
-            UiColor(0,0,0, 1)
+            -- BG
             do UiPush()
-                UiTranslate(-4,0)
-                UiRect(sliderWidth+8, 36)
+                UiTranslate(UiCenter(), UiMiddle()+100)
+                UiColor(0,0,0, 0.5)
+                UiRect(1000, 400)
             UiPop() end
 
-            UiColor(1, 1 - 1/forceFactor, 1 - 1/forceFactor, 1)
-            UiRect(sliderWidth / forceFactor, 28)
-
-            -- Mouse image
+            -- Spear velocity
+            UiTranslate(-250, 0)
             do UiPush()
-                UiAlign('center middle')
-                UiColor(1,1,1, 1)
-                UiTranslate(sliderWidth/2, 96)
-                UiImageBox('MOD/img/mouse.png', 100,100, 1,1)
 
+                local sliderWidth = 400
+                local velocityFactor = SPEARS.velocityMax/gtZero(SPEARS.velocity)
+
+                UiTranslate(UiCenter(), UiMiddle())
+                UiText('Speed:')
+
+                UiFont('bold.ttf', 48)
+                UiTranslate(0, 48)
+                UiText(sfn(SPEARS.velocity,0) .. ' m/s')
+
+                UiAlign('left middle')
+                UiTranslate(-sliderWidth/2, 48)
+
+                UiColor(0,0,0, 1)
                 do UiPush()
-                    UiTranslate(100, 0)
-                    UiRotate(90)
-                    UiImageBox('MOD/img/arrow_right.png', 100,100, 1,1)
+                    UiTranslate(-4,0)
+                    UiRect(sliderWidth+8, 36)
                 UiPop() end
+
+                UiColor(1, 1 - 1/velocityFactor, 1 - 1/velocityFactor, 1)
+                UiRect(sliderWidth / velocityFactor, 28)
+
+                -- Mouse image
                 do UiPush()
-                    UiTranslate(-100, 0)
-                    UiRotate(90)
-                    UiImageBox('MOD/img/arrow_left.png', 100,100, 1,1)
+
+                    UiAlign('center middle')
+                    UiColor(1,1,1, 1)
+                    UiTranslate(sliderWidth/2, 96)
+                    UiImageBox('MOD/img/mouse.png', 100,100, 1,1)
+
+                    do UiPush()
+                        UiTranslate(100, 0)
+                        UiImageBox('MOD/img/arrow_right.png', 100,100, 1,1)
+                    UiPop() end
+                    do UiPush()
+                        UiTranslate(-100, 0)
+                        UiImageBox('MOD/img/arrow_left.png', 100,100, 1,1)
+                    UiPop() end
+
                 UiPop() end
 
             UiPop() end
 
-        UiPop() end
+            -- Spear force
+            UiTranslate(500, 0)
+            do UiPush()
+
+                local sliderWidth = 400
+                local forceFactor = SPEARS.forceMultiplierMax/gtZero(SPEARS.forceMultiplier)
+
+                UiTranslate(UiCenter(), UiMiddle())
+                UiText('Force Multiplier:')
+
+                UiFont('bold.ttf', 48)
+                UiTranslate(0, 48)
+                UiText(sfn(SPEARS.forceMultiplier,1)*100 .. ' %')
+
+                UiAlign('left middle')
+                UiTranslate(-sliderWidth/2, 48)
+
+                UiColor(0,0,0, 1)
+                do UiPush()
+                    UiTranslate(-4,0)
+                    UiRect(sliderWidth+8, 36)
+                UiPop() end
+
+                UiColor(1, 1 - 1/forceFactor, 1 - 1/forceFactor, 1)
+                UiRect(sliderWidth / forceFactor, 28)
+
+                -- Mouse image
+                do UiPush()
+                    UiAlign('center middle')
+                    UiColor(1,1,1, 1)
+                    UiTranslate(sliderWidth/2, 96)
+                    UiImageBox('MOD/img/mouse.png', 100,100, 1,1)
+
+                    do UiPush()
+                        UiTranslate(100, 0)
+                        UiRotate(90)
+                        UiImageBox('MOD/img/arrow_right.png', 100,100, 1,1)
+                    UiPop() end
+                    do UiPush()
+                        UiTranslate(-100, 0)
+                        UiRotate(90)
+                        UiImageBox('MOD/img/arrow_left.png', 100,100, 1,1)
+                    UiPop() end
+
+                UiPop() end
+
+            UiPop() end
+        end
+
+
 
     end
 end
