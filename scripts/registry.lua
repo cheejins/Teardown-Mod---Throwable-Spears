@@ -6,14 +6,14 @@ function modReset()
     regSetFloat('spears.forceMultiplier'    ,1)
     regSetFloat('spears.forceMultiplierMax' ,20)
 
-    regSetFloat('spears.sharpness'          ,20)
+    regSetFloat('spears.sharpness'          ,50)
     regSetFloat('spears.extraThrowHeight'   ,0)
 
-    regSetBool('spears.unbreakableSpears'       , true)
+    regSetBool('spears.unbreakableSpears'       , false)
     regSetBool('spears.collisions'              , false)
     regSetBool('spears.rain'                    , false)
     regSetBool('spears.throwFlat'               , false)
-    regSetBool('spears.tipLight'                , true)
+    regSetBool('spears.tipLight'                , false)
     regSetBool('spears.hitMarker'               , false)
     regSetBool('spears.yeetMode'                , false)
 

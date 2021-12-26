@@ -275,6 +275,12 @@ do
 
     function processInput()
 
+        local yeetMode = SPEARS.yeetMode and not (UI_OPTIONS or drawingSpearQuickOptions)
+        if InputPressed('lmb') and isUsingTool and yeetMode then
+            local pos = GetCameraTransform().pos
+            sounds.play.yeet(pos)
+        end
+
         --> Delete all spears.
         if InputPressed('r') and isUsingTool then
             deleteSpears()

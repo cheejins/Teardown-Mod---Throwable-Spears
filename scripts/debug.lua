@@ -1,5 +1,5 @@
 db = false
-db = true
+-- db = true
 
 function db_func(func) if db then func() end end -- debug function call
 

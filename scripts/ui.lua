@@ -14,7 +14,7 @@ function uiDrawOptions()
     local w = UiWidth()
     local h = UiHeight()
 
-    local cont_w = 1400
+    local cont_w = 1100
     local cont_h = 800
     local cont_marginY = 100
 
@@ -48,7 +48,7 @@ function uiDrawOptions()
             UiText('Spear Options')
         UiPop() end
 
-        UiTranslate(0, 200)
+        UiTranslate(180, 180)
 
         do UiPush()
 
@@ -74,11 +74,11 @@ function uiDrawOptions()
                     UiTranslate(btnSpacing, 0)
                     do UiPush()
                         if SPEARS.mode == SPEARS.modes.straight then
-                            UiColor(0,1,0, 1)
-                            UiFont('bold.ttf', 26)
+                            UiColor(1,1,1, 1)
+                            UiFont('bold.ttf', 28)
                         end
                         UiButtonImageBox("ui/common/box-outline-fill-6.png", 10,10)
-                        if UiTextButton('Forward', btnW, btnH) then
+                        if UiTextButton('Straight', btnW, btnH) then
                             SPEARS.mode = SPEARS.modes.straight
                         end
                     UiPop() end
@@ -86,8 +86,8 @@ function uiDrawOptions()
                     UiTranslate(btnSpacing, 0)
                     do UiPush()
                         if SPEARS.mode == SPEARS.modes.flat then
-                            UiColor(0,1,0, 1)
-                            UiFont('bold.ttf', 26)
+                            UiColor(1,1,1, 1)
+                            UiFont('bold.ttf', 28)
                         end
                         UiButtonImageBox("ui/common/box-outline-fill-6.png", 10,10)
                         if UiTextButton('Flat', btnW, btnH) then
@@ -98,8 +98,8 @@ function uiDrawOptions()
                     UiTranslate(btnSpacing, 0)
                     do UiPush()
                         if SPEARS.mode == SPEARS.modes.rain then
-                            UiColor(0,1,0, 1)
-                            UiFont('bold.ttf', 26)
+                            UiColor(1,1,1, 1)
+                            UiFont('bold.ttf', 28)
                         end
                         UiButtonImageBox("ui/common/box-outline-fill-6.png", 10,10)
                         if UiTextButton('Rain', btnW, btnH) then
@@ -146,7 +146,7 @@ function uiDrawOptions()
 
                 do UiPush()
 
-                    UiTranslate(-250, 0)
+                    UiTranslate(-250, 24)
 
                     ui.checkBox.create('Unbreakable Spears', 'spears.unbreakableSpears')
                     UiTranslate(0, marginYSize)
@@ -168,46 +168,61 @@ function uiDrawOptions()
 
             UiPop() end
 
-        UiPop() end
+            do UiPush()
 
-        do UiPush()
+                -- UiColor(1,1,1, 1)
+                -- UiFont('bold.ttf', 24)
+                -- UiAlign('left middle')
 
-            local resetW = 160
-            local closeW = 80
-            local wAlign = (resetW + closeW) / 2
+                -- UiTranslate(50, 0)
+                -- UiText('Controls')
 
-            UiTranslate(UiCenter()-wAlign, cont_h - cont_marginY - 150)
-            -- UiTranslate(UiCenter(), cont_h - cont_marginY - 150)
+                -- UiTranslate(0, 32)
+                -- UiText('left click = Throw spear')
 
-            UiAlign('center middle')
-            UiImageBox("ui/common/box-outline-fill-6.png", closeW, 50, 10, 10)
-            if UiTextButton('Close') then
-                UI_OPTIONS = not UI_OPTIONS
-            end
+                -- UiTranslate(0, 32)
+                -- UiText('right click = Show "quick options"')
 
-            UiTranslate(resetW/2 + closeW/2 + 10, 0)
-            -- UiTranslate(0, -60)
+                -- UiTranslate(0, 32)
+                -- UiText('r = Remove all spears')
 
-            UiImageBox("ui/common/box-outline-fill-6.png", resetW, 50, 10, 10)
-            if UiTextButton('Reset Spear') then
-                modReset()
-            end
+                -- UiTranslate(0, 32)
+                -- UiText('z = Undo last spear')
+
+            UiPop() end
 
         UiPop() end
-
 
     UiPop() end
 
-end
+    do UiPush()
 
+        UiColor(1,1,1, 1)
+        UiFont('bold.ttf', 24)
+        UiAlign('center middle')
 
---- Manage when to open and close the options menu.
-function uiManageGameOptions()
+        local closeW = 80
+        local resetW = 160
+        local wAlign = (resetW + closeW) / 2
 
-    if UI_OPTIONS then
-        UiMakeInteractive()
-        uiDrawOptions()
-    end
+        -- UiTranslate(UiCenter()-wAlign, cont_h - cont_marginY - 150)
+
+        UiTranslate(-100, 0)
+
+        UiTranslate(UiCenter(), 850)
+        UiAlign('center middle')
+        UiButtonImageBox("ui/common/box-outline-fill-6.png", 10,10)
+        if UiTextButton('Close', closeW, 50) then
+            UI_OPTIONS = not UI_OPTIONS
+        end
+
+        UiTranslate(140, 0)
+        UiButtonImageBox("ui/common/box-outline-fill-6.png", 10,10)
+        if UiTextButton('Reset Spear', resetW, 50) then
+            modReset()
+        end
+
+    UiPop() end
 
 end
 
@@ -226,7 +241,7 @@ function drawSpearQuickOptions()
 
             -- BG
             UiTranslate(UiCenter(), UiMiddle()-200)
-            UiColor(0,0,0, 0.5)
+            UiColor(0,0,0, 0.8)
             UiRect(400, 200)
 
             UiTranslate(-50, 0)
@@ -250,7 +265,7 @@ function drawSpearQuickOptions()
             -- BG
             do UiPush()
                 UiTranslate(UiCenter(), UiMiddle()+100)
-                UiColor(0,0,0, 0.5)
+                UiColor(0,0,0, 0.8)
                 UiRect(1000, 400)
             UiPop() end
 
@@ -273,6 +288,7 @@ function drawSpearQuickOptions()
 
                 UiColor(0,0,0, 1)
                 do UiPush()
+                    UiColor(0.2,0.2,0.2, 1)
                     UiTranslate(-4,0)
                     UiRect(sliderWidth+8, 36)
                 UiPop() end
@@ -320,6 +336,7 @@ function drawSpearQuickOptions()
 
                 UiColor(0,0,0, 1)
                 do UiPush()
+                    UiColor(0.2,0.2,0.2, 1)
                     UiTranslate(-4,0)
                     UiRect(sliderWidth+8, 36)
                 UiPop() end
@@ -399,6 +416,18 @@ function drawToolText()
 
 
 end
+
+
+--- Manage when to open and close the options menu.
+function uiManageGameOptions()
+
+    if UI_OPTIONS then
+        UiMakeInteractive()
+        uiDrawOptions()
+    end
+
+end
+
 
 
 ui = {}
