@@ -15,7 +15,8 @@ function uiDrawOptions()
     local h = UiHeight()
 
     local cont_w = 1400
-    local cont_h = 1000
+    local cont_h = 800
+    local cont_marginY = 100
 
     do UiPush()
 
@@ -26,34 +27,37 @@ function uiDrawOptions()
         marginYSize = 80
         local marginY = 0
 
+        UiTranslate(0, cont_marginY)
+
         do UiPush()
-            UiTranslate(UiCenter(), UiMiddle())
+            UiTranslate(UiCenter(), 0)
+            UiAlign('center top')
             UiColor(0,0,0, 0.75)
             UiRect(cont_w, cont_h)
+
+            if InputDown('lmb') and not UiIsMouseInRect(cont_w, cont_h) then
+                UI_OPTIONS = not UI_OPTIONS
+            end
+
+
         UiPop() end
 
         do UiPush()
-            UiTranslate(UiCenter(), 100)
+            UiTranslate(UiCenter(), 32)
+            UiAlign('center top')
             UiFont('bold.ttf', 72)
             UiText('Spear Options')
         UiPop() end
 
+        UiTranslate(0, 200)
+
         do UiPush()
 
-            UiTranslate(UiCenter()-350, 250)
+            UiTranslate(UiCenter()-330, 0)
 
             do UiPush()
 
-                -- do UiPush()
-                --     -- UiTranslate(-350 + 94, 0)
-                --     -- UiAlign('left middle')
-                --     UiFont('bold.ttf', 48)
-                --     UiText('Physics')
-                -- UiPop() end
-                -- UiTranslate(0, marginYSize)
-                -- marginY = marginY + marginYSize
-
-                UiTranslate(-250, 0)
+                UiTranslate(-250, 10)
 
                 -- Velocity
                 ui.slider.create('Velocity', 'spears.velocity', 'm/s', 1, SPEARS.velocityMax)
@@ -61,7 +65,12 @@ function uiDrawOptions()
                 marginY = marginY + marginYSize
 
                 -- Velocity Max
-                ui.slider.create('Max Velocity', 'spears.velocityMax', 'm/s', 1, 500)
+                ui.slider.create('Max Velocity', 'spears.velocityMax', 'm/s', 0, 500)
+                UiTranslate(0, marginYSize)
+                marginY = marginY + marginYSize
+
+                -- Force Multiplier
+                ui.slider.create('Force Multiplier', 'spears.forceMultiplier', '', 0, SPEARS.forceMultiplierMax)
                 UiTranslate(0, marginYSize)
                 marginY = marginY + marginYSize
 
@@ -70,60 +79,57 @@ function uiDrawOptions()
                 UiTranslate(0, marginYSize)
                 marginY = marginY + marginYSize
 
-                -- Force Multiplier
-                ui.slider.create('Force Multiplier', 'spears.forceMultiplier', '', 0, 10)
-                UiTranslate(0, marginYSize)
-                marginY = marginY + marginYSize
-
-                -- Throw Height
-                ui.slider.create('Extra Throw Height', 'spears.extraThrowHeight', 'meters', 0, 5)
-                UiTranslate(0, marginYSize)
-                marginY = marginY + marginYSize
-
-                ui.checkBox.create('Impaling', 'spears.impaling')
-                UiTranslate(0, marginYSize)
-                marginY = marginY + marginYSize
-
-            UiPop() end
-
-        UiPop() end
-
-        do UiPush()
-
-            UiTranslate(UiCenter()+350, 250)
-
-            do UiPush()
-
-                -- do UiPush()
-                --     -- UiTranslate(-350 + 94, 0)
-                --     -- UiAlign('left middle')
-                --     UiFont('bold.ttf', 48)
-                --     UiText('Misc')
-                -- UiPop() end
+                -- -- Throw Height
+                -- ui.slider.create('Extra Throw Height', 'spears.extraThrowHeight', 'meters', 0, 5)
                 -- UiTranslate(0, marginYSize)
                 -- marginY = marginY + marginYSize
 
-                UiTranslate(-250, 0)
+            UiPop() end
 
-                ui.slider.create('Velocity', 'spears.velocity', 'm/s', 1, 500)
-                UiTranslate(0, marginYSize)
-                marginY = marginY + marginYSize
+        UiPop() end
 
-                ui.slider.create('Sharpness', 'spears.sharpness', '%', 0, 100)
-                UiTranslate(0, marginYSize)
-                marginY = marginY + marginYSize
+        do UiPush()
 
-                ui.slider.create('Force Multiplier', 'spears.forceMultiplier', '', 0, 10)
-                UiTranslate(0, marginYSize)
-                marginY = marginY + marginYSize
+            UiTranslate(UiCenter()+360, 0)
 
-                ui.slider.create('Extra Throw Height', 'spears.extraThrowHeight', 'meters', 0, 5)
-                UiTranslate(0, marginYSize)
-                marginY = marginY + marginYSize
+            do UiPush()
 
-                ui.checkBox.create('Impaling', 'spears.impaling')
-                UiTranslate(0, marginYSize)
-                marginY = marginY + marginYSize
+                do UiPush()
+
+                    UiTranslate(-250, 0)
+
+                    ui.checkBox.create('Unbreakable Spears', 'spears.unbreakableSpears')
+                    UiTranslate(0, marginYSize)
+                    marginY = marginY + marginYSize
+
+                    ui.checkBox.create('Spears Collisions', 'spears.collisions')
+                    UiTranslate(0, marginYSize)
+                    marginY = marginY + marginYSize
+
+                    ui.checkBox.create('Spear Rain', 'spears.rain')
+                    UiTranslate(0, marginYSize)
+                    marginY = marginY + marginYSize
+
+                UiPop() end
+
+
+                do UiPush()
+
+                    UiTranslate(50, 0)
+
+                    ui.checkBox.create('Throw Spears Flat', 'spears.throwFlat')
+                    UiTranslate(0, marginYSize)
+                    marginY = marginY + marginYSize
+
+                    ui.checkBox.create('Hit Marker', 'spears.hitMarker')
+                    UiTranslate(0, marginYSize)
+                    marginY = marginY + marginYSize
+
+                    ui.checkBox.create('YEET MODE', 'spears.yeetMod')
+                    UiTranslate(0, marginYSize)
+                    marginY = marginY + marginYSize
+
+                    UiPop() end
 
             UiPop() end
 
@@ -131,11 +137,11 @@ function uiDrawOptions()
 
         do UiPush()
 
-            local resetW = 200
+            local resetW = 160
             local closeW = 80
             local wAlign = (resetW + closeW) / 2
 
-            UiTranslate(UiCenter()-wAlign, cont_h)
+            UiTranslate(UiCenter()-wAlign, cont_h - cont_marginY - 150)
 
             UiAlign('center middle')
             UiImageBox("ui/common/box-outline-fill-6.png", closeW, 50, 10, 10)
@@ -169,15 +175,21 @@ function uiManageGameOptions()
 end
 
 
-
-function drawSpearForce()
-    if drawingSpearForce then
+function drawSpearQuickOptions()
+    if drawingSpearQuickOptions then
 
         UiMakeInteractive()
 
         UiColor(1,1,1, 1)
         UiFont('bold.ttf', 36)
         UiAlign('center middle')
+        UiTranslate(0, -100)
+
+        do UiPush()
+            UiTranslate(UiCenter(), UiMiddle()+100)
+            UiColor(0,0,0, 0.5)
+            UiRect(1000, 400)
+        UiPop() end
 
         UiTranslate(-250, 0)
 
@@ -192,13 +204,16 @@ function drawSpearForce()
 
             UiFont('bold.ttf', 48)
             UiTranslate(0, 48)
-            UiText(sfn(SPEARS.velocity))
+            UiText(sfn(SPEARS.velocity,0) .. ' m/s')
 
             UiAlign('left middle')
             UiTranslate(-sliderWidth/2, 48)
 
             UiColor(0,0,0, 1)
-            UiRect(sliderWidth, 36)
+            do UiPush()
+                UiTranslate(-4,0)
+                UiRect(sliderWidth+8, 36)
+            UiPop() end
 
             UiColor(1, 1 - 1/velocityFactor, 1 - 1/velocityFactor, 1)
             UiRect(sliderWidth / velocityFactor, 28)
@@ -236,16 +251,19 @@ function drawSpearForce()
 
             UiFont('bold.ttf', 48)
             UiTranslate(0, 48)
-            UiText(sfn(SPEARS.forceMultiplier))
+            UiText(sfn(SPEARS.forceMultiplier,1)*100 .. ' %')
 
             UiAlign('left middle')
             UiTranslate(-sliderWidth/2, 48)
 
             UiColor(0,0,0, 1)
-            UiRect(sliderWidth, 36)
+            do UiPush()
+                UiTranslate(-4,0)
+                UiRect(sliderWidth+8, 36)
+            UiPop() end
 
             UiColor(1, 1 - 1/forceFactor, 1 - 1/forceFactor, 1)
-            -- UiRect(sliderWidth / forceFactor, 28)
+            UiRect(sliderWidth / forceFactor, 28)
 
             -- Mouse image
             do UiPush()
@@ -256,10 +274,12 @@ function drawSpearForce()
 
                 do UiPush()
                     UiTranslate(100, 0)
+                    UiRotate(90)
                     UiImageBox('MOD/img/arrow_right.png', 100,100, 1,1)
                 UiPop() end
                 do UiPush()
                     UiTranslate(-100, 0)
+                    UiRotate(90)
                     UiImageBox('MOD/img/arrow_left.png', 100,100, 1,1)
                 UiPop() end
 
@@ -268,6 +288,23 @@ function drawSpearForce()
         UiPop() end
 
     end
+end
+
+
+function drawToolText()
+
+    UiTranslate(UiCenter(), UiHeight())
+
+    UiColor(0.75,0.75,0.75, 1)
+    UiFont('bold.ttf', 24)
+    UiAlign('center middle')
+
+    UiTranslate(0, -56)
+    UiText('Press "o" to show all options.')
+
+    UiTranslate(0, -30)
+    UiText('Hold "right click" to show quick options.')
+
 end
 
 
@@ -353,7 +390,6 @@ function ui.checkBox.create(title, registryPath)
     UiColor(1,1,1, 1)
     UiFont('regular.ttf', font_normal)
     UiText(title)
-    UiRect(4,4)
     UiTranslate(0, font_normal * 1.2 )
 
     -- Toggle BG

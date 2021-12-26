@@ -28,6 +28,15 @@ function tick()
 end
 
 function draw()
-    uiManageGameOptions()
-    drawSpearForce()
+
+    do UiPush()
+        uiManageGameOptions()
+    UiPop() end
+
+    do UiPush()
+        drawSpearQuickOptions()
+    UiPop() end
+
+    drawToolText()
+
 end

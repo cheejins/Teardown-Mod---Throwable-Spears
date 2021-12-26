@@ -12,21 +12,36 @@ end
 
 function updateSpears()
 
-    SPEARS.velocityMax = regGetFloat('spears.velocityMax')
-
     SPEARS.velocity = regGetFloat('spears.velocity')
+    SPEARS.velocityMax = regGetFloat('spears.velocityMax')
     regSetFloat('spears.velocity', clamp(SPEARS.velocity, 0, SPEARS.velocityMax))
-
-    SPEARS.impaling = true
-
-    SPEARS.holeSize = 0.3 -- (spear sharpness)
-    SPEARS.holeDepth = 2 -- (spear sharpness)
 
     SPEARS.forceMultiplier = regGetFloat('spears.forceMultiplier')
     SPEARS.forceMultiplierMax = regGetFloat('spears.forceMultiplierMax')
 
-    SPEARS.unbreakable = true
-    -- SPEARS.overheadThrow = regGetBool('spears.overheadThrow')
+    -- SPEARS.sharpness = regGetFloat('spears.sharpness')/100
+    SPEARS.sharpness = 1
+    SPEARS.holeSize = 0.2 + (0.5*SPEARS.sharpness) -- (spear sharpness)
+    SPEARS.holeDepth = 3 * SPEARS.sharpness -- (spear sharpness)
+
+    SPEARS.extraThrowHeight = regGetFloat('spears.extraThrowHeight')
+
+
+    SPEARS.unbreakableSpears = regGetBool('spears.unbreakableSpears')
+    SPEARS.collisions = regGetBool('spears.collisions')
+    SPEARS.rain = regGetBool('spears.rain')
+
+    SPEARS.throwFlat = regGetBool('spears.throwFlat')
+    SPEARS.hitMarker = regGetBool('spears.hitMarker')
+    SPEARS.yeetMode = regGetBool('spears.yeetMode')
+
+
+    if SPEARS.throwFlat then
+        regSetBool('spears.rain', false)
+    end
+    if SPEARS.rain then
+        regSetBool('spears.throwFlat', false)
+    end
 
 end
 
@@ -43,13 +58,19 @@ do
 
             -- Tip pos of the spear.
             local x,y,z = GetShapeSize(spear.shape)
-            local tipPos = TransformToParentPoint(tr, Vec(0, 0, -y-1))
+            local tipPos = TransformToParentPoint(tr, Vec(0, 0, -y-1.7))
             spear.tipPos = tipPos
+
 
             if spear.impaling.impales < spear.impaling.impaleTicks then
 
-                processSpearForce(spear, tipPos)
-                processSpearSharpness(tr, x,y,z)
+                processSpearTip(spear, tipPos)
+
+                if spear.impaling.impaled then
+                    spear.impaling.impales = spear.impaling.impales + 1 -- Increment number of ticks impaled so far.
+                end
+
+                applySpearSharpness(tr, x,y,z)
 
             end
 
@@ -61,21 +82,54 @@ do
 
         pipebombs = FindShapes('bomb', true)
 
+        local playerTr = GetPlayerTransform()
+
         for key, shape in pairs(pipebombs) do
 
             -- if GetShapeVoxelCount(shape) == 21 then
                 RemoveTag(shape,'bomb')
                 RemoveTag(shape,'smoke')
 
-                ternary(SPEARS.unbreakable, SetTag(shape,'unbreakable'))
-
+                if SPEARS.unbreakableSpears then
+                    SetTag(shape, 'unbreakable')
+                end
             -- end
 
+            -- Set spear spawn
             local body = GetShapeBody(shape)
             local bodyTrSpear = TransformCopy(GetCameraTransform())
             bodyTrSpear.pos = TransformToParentPoint(bodyTrSpear, Vec(0,0,-3))
+            local hit, hitPos, hitShape = RaycastFromTransform(GetCameraTransform(), 500)
+
+            if SPEARS.rain then
+
+                if hit then
+                    -- Top of hit shape
+                    local min, max = GetShapeBounds(hitShape)
+                    local maxY = min[2] + max[2]
+                    local spawnPos = VecAdd(hitPos, Vec(0, maxY + SPEARS.velocity, 0))
+
+                    local spawnRot = QuatLookDown(spawnPos)
+
+                    bodyTrSpear = Transform(spawnPos, spawnRot)
+
+                    PointLight(hitPos, 1,0,0, 2)
+                    DrawDot(hitPos, 0.25,0.25, 1,0,0, 1)
+                end
+
+            end
+
+            if SPEARS.throwFlat and hit then
+                bodyTrSpear.pos = Vec(playerTr.pos[1], hitPos[2], playerTr.pos[3])
+                bodyTrSpear.rot = QuatLookAt(bodyTrSpear.pos, hitPos)
+            end
+
             setSpearSpawn(body, bodyTrSpear)
 
+            -- Spear collisions
+            if not SPEARS.collisions then
+                SetShapeCollisionFilter(shape, 2, 255-2)
+            end
 
             local spear = {
 
@@ -84,6 +138,7 @@ do
 
                 impaling = {
 
+                    impaled = false,
                     impales = 0,
                     -- impaleTicks = VecLength(GetBodyVelocity(body))/3, -- Impale for this many ticks after the tip hits an object.
                     impaleTicks = 15, -- Impale for this many ticks after the tip hits an object.
@@ -111,24 +166,24 @@ do
 
     end
 
-    function processSpearSharpness(tr, x,y,z)
+    function applySpearSharpness(tr, x,y,z)
 
         local shapnessDepth = SPEARS.holeDepth
         local shapnessSize = SPEARS.holeSize
 
         for i = 1, shapnessDepth, shapnessSize  do
             local shapnessDepthIncrement = shapnessDepth - i
-            local holePos = TransformToParentPoint(tr, Vec(0, 0, -y-1.3+shapnessDepthIncrement))
-            MakeHole(holePos, 0.4, 0.4, 0.4, 0.4)
+            local holePos = TransformToParentPoint(tr, Vec(0, 0, -y-1.9+shapnessDepthIncrement))
+            MakeHole(holePos, shapnessSize, shapnessSize, shapnessSize, shapnessSize)
             dbcr(holePos, 1,1,1, 1)
         end
 
     end
 
-    function processSpearForce(spear, tipPos)
+    function processSpearTip(spear, tipPos)
 
         -- Spear tip aabb
-        local aabbOffset = Vec(SPEARS.holeSize, SPEARS.holeSize, SPEARS.holeSize)
+        local aabbOffset = Vec(0.3, 0.3, 0.3)
         local tipMin = VecAdd(tipPos, aabbOffset)
         local tipMax = VecAdd(tipPos, VecScale(aabbOffset, -1))
         local aabbColor = Vec(1,1,1)
@@ -137,20 +192,39 @@ do
         QueryRejectBody(spear.body)
         local hitBodies = QueryAabbBodies(tipMin, tipMax)
 
-        -- Process spear impaling/force.
-        for index, body in ipairs(hitBodies) do
+        local spearVelLow = VecLength(GetBodyVelocity(spear.body))  < 10
+        if #hitBodies > 0 or spearVelLow then
 
-            if body ~= GlobalBody then
-                aabbColor = Vec(1,0,0)
-                DrawBodyOutline(body, 1,0,0,1)
-                applySpearForce(spear, body) -- Impale bodies at the tip of the spear.
+            spear.impaling.impaled = true
+
+            aabbColor = Vec(0,1,0)
+            local hitGlobalBody = false
+
+            -- Process spear impaling/force.
+            for index, body in ipairs(hitBodies) do
+
+                if body ~= GlobalBody then
+                    aabbColor = Vec(1,0,0)
+                    if db then
+                        DrawBodyOutline(body, 1,0,0,1)
+                    end
+                    applySpearForce(spear, body) -- Impale bodies at the tip of the spear.
+                else
+                    aabbColor = Vec(1,1,0)
+                    hitGlobalBody = true
+                end
+
+            end
+
+            if hitGlobalBody then
+                spear.impaling.impales = spear.impaling.impales + 1
             end
 
         end
 
-        spear.impaling.impales = spear.impaling.impales + 1 -- Increment number of ticks impaled so far.
-
-        AabbDraw(tipMin, tipMax, aabbColor[1], aabbColor[2], aabbColor[3]) -- Draw spear tip aabb.
+        if db then
+            AabbDraw(tipMin, tipMax, aabbColor[1], aabbColor[2], aabbColor[3]) -- Draw spear tip aabb.
+        end
 
     end
 
@@ -160,27 +234,6 @@ end
 
 -- OTHER
 do
-
-    function processVelocityCharging()
-
-        local velCharge = regGetFloat('spears.velocity')
-        local max = SPEARS.velocityMax
-        local increment = 500/SPEARS.velocityMax
-
-        if velCharge <= 0 then
-            velCharge = increment*2
-            SPEARS.velocitySign = 1
-        elseif velCharge >= max then
-            velCharge = max - (increment*2)
-            SPEARS.velocitySign = -1
-        end
-
-        regSetFloat('spears.velocity', velCharge + (SPEARS.velocitySign * increment))
-
-        dbw('SPEARS.velocitySign', SPEARS.velocitySign)
-        dbw('spears.velocity', velCharge)
-
-    end
 
     function setSpearSpawn(spearBody, tr, vel)
         SetBodyTransform(spearBody, tr)
@@ -221,16 +274,33 @@ do
         --> Toggle options UI.
         if InputDown('rmb') and isUsingTool then
 
-            drawingSpearForce = true
+            drawingSpearQuickOptions = true
 
-            local dx = InputValue('mousedx')/5
+            local dy = InputValue('mousedy')
+            local dx = InputValue('mousedx')
+
+            if math.abs(math.floor(dy^3)) > math.abs(math.floor(dx^3)) then
+                dx = 0
+            else
+                dy = 0
+            end
+
+            dy = -dy / 500 * SPEARS.forceMultiplierMax
+            dx = dx / 500 * SPEARS.velocityMax
+
+            dbw('dx', dx)
+            dbw('dy', dy)
+
             regSetFloat('spears.velocity', clamp(SPEARS.velocity + dx, 0, SPEARS.velocityMax))
-
-            local dy = InputValue('mousedy')/10
             regSetFloat('spears.forceMultiplier', clamp(SPEARS.forceMultiplier + dy, 0, SPEARS.forceMultiplierMax))
 
+            if InputPressed('lmb') then
+                UI_OPTIONS = not UI_OPTIONS
+                drawingSpearQuickOptions = false
+            end
+
         else
-            drawingSpearForce = false
+            drawingSpearQuickOptions = false
         end
 
     end
