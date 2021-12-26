@@ -3,9 +3,38 @@ function initSpears()
     SetString("game.tool.pipebomb.name", "Throwable Spear") -- Rename pipebomb
     ActiveSpears = {} -- Table of spear objects.
 
+
     SPEARS = {} -- Base config for all spears.
+
     SPEARS.velocitySign = 1
     SPEARS.velocityCharge = regGetFloat('spears.velocity')
+
+    SPEARS.modes = {straight = 'straight', flat = 'flat', rain = 'rain'}
+    SPEARS.mode = SPEARS.modes.straight
+
+end
+
+
+function processSpearMode()
+
+    -- I know this is terrible. It works for now lol.
+
+    if SPEARS.mode == SPEARS.modes.straight then
+
+        regSetBool('spears.rain', false)
+        regSetBool('spears.throwFlat', false)
+
+    elseif SPEARS.mode == SPEARS.modes.flat then
+
+        regSetBool('spears.rain', false)
+        regSetBool('spears.throwFlat', true)
+
+    elseif SPEARS.mode == SPEARS.modes.rain then
+
+        regSetBool('spears.rain', true)
+        regSetBool('spears.throwFlat', false)
+
+    end
 
 end
 
@@ -19,8 +48,8 @@ function updateSpears()
     SPEARS.forceMultiplier = regGetFloat('spears.forceMultiplier')
     SPEARS.forceMultiplierMax = regGetFloat('spears.forceMultiplierMax')
 
-    -- SPEARS.sharpness = regGetFloat('spears.sharpness')/100
-    SPEARS.sharpness = 1
+    SPEARS.sharpness = regGetFloat('spears.sharpness')/100
+    -- SPEARS.sharpness = 1
     SPEARS.holeSize = 0.2 + (0.5*SPEARS.sharpness) -- (spear sharpness)
     SPEARS.holeDepth = 3 * SPEARS.sharpness -- (spear sharpness)
 
@@ -34,14 +63,7 @@ function updateSpears()
     SPEARS.throwFlat = regGetBool('spears.throwFlat')
     SPEARS.hitMarker = regGetBool('spears.hitMarker')
     SPEARS.yeetMode = regGetBool('spears.yeetMode')
-
-
-    if SPEARS.throwFlat then
-        regSetBool('spears.rain', false)
-    end
-    if SPEARS.rain then
-        regSetBool('spears.throwFlat', false)
-    end
+    SPEARS.tipLight = regGetBool('spears.tipLight')
 
 end
 
@@ -61,7 +83,6 @@ do
             local tipPos = TransformToParentPoint(tr, Vec(0, 0, -y-1.7))
             spear.tipPos = tipPos
 
-
             if spear.impaling.impales < spear.impaling.impaleTicks then
 
                 processSpearTip(spear, tipPos)
@@ -72,6 +93,10 @@ do
 
                 applySpearSharpness(tr, x,y,z)
 
+            end
+
+            if SPEARS.tipLight then
+                PointLight(tipPos, 1,1,1, 2)
             end
 
         end
@@ -250,8 +275,6 @@ do
 
     function processInput()
 
-        local isUsingTool = GetString('game.player.tool') == 'pipebomb'
-
         --> Delete all spears.
         if InputPressed('r') and isUsingTool then
             deleteSpears()
@@ -271,32 +294,15 @@ do
             UI_OPTIONS = not UI_OPTIONS
         end
 
-        --> Toggle options UI.
+        --> Quick options UI.
         if InputDown('rmb') and isUsingTool then
 
             drawingSpearQuickOptions = true
 
-            local dy = InputValue('mousedy')
-            local dx = InputValue('mousedx')
-
-            if math.abs(math.floor(dy^3)) > math.abs(math.floor(dx^3)) then
-                dx = 0
-            else
-                dy = 0
-            end
-
-            dy = -dy / 500 * SPEARS.forceMultiplierMax
-            dx = dx / 500 * SPEARS.velocityMax
-
-            dbw('dx', dx)
-            dbw('dy', dy)
-
-            regSetFloat('spears.velocity', clamp(SPEARS.velocity + dx, 0, SPEARS.velocityMax))
-            regSetFloat('spears.forceMultiplier', clamp(SPEARS.forceMultiplier + dy, 0, SPEARS.forceMultiplierMax))
+            processQuickOptionsMouseInput()
 
             if InputPressed('lmb') then
-                UI_OPTIONS = not UI_OPTIONS
-                drawingSpearQuickOptions = false
+                incrementSpearMode()
             end
 
         else
@@ -307,6 +313,53 @@ do
 
     function debugMod()
         dbw('#ActiveSpears', #ActiveSpears)
+    end
+
+
+    function incrementSpearMode()
+        -- Convert SPEARS.modes to numeric keys.
+        local spearModeIndex = nil
+        local modes = {}
+        for key, mode in pairs(SPEARS.modes) do
+            table.insert(modes, mode)
+        end
+
+        for i, mode in ipairs(modes) do
+            if SPEARS.mode == mode then
+                spearModeIndex = i
+                break
+            end
+        end
+
+        if spearModeIndex + 1 > #modes then
+            SPEARS.mode = modes[1]
+        else
+            SPEARS.mode = modes[spearModeIndex + 1]
+        end
+
+        dbw('spearModeIndex', spearModeIndex)
+        dbw('SPEARS.mode', SPEARS.mode)
+    end
+
+
+    function processQuickOptionsMouseInput()
+        local dy = InputValue('mousedy')
+        local dx = InputValue('mousedx')
+
+        if math.abs(math.floor(dy^3)) > math.abs(math.floor(dx^3)) then
+            dx = 0
+        else
+            dy = 0
+        end
+
+        dy = -dy / 500 * SPEARS.forceMultiplierMax
+        dx = dx / 500 * SPEARS.velocityMax
+
+        dbw('dx', dx)
+        dbw('dy', dy)
+
+        regSetFloat('spears.velocity', clamp(SPEARS.velocity + dx, 0, SPEARS.velocityMax))
+        regSetFloat('spears.forceMultiplier', clamp(SPEARS.forceMultiplier + dy, 0, SPEARS.forceMultiplierMax))
     end
 
 end

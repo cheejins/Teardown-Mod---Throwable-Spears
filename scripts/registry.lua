@@ -13,6 +13,7 @@ function modReset()
     regSetBool('spears.collisions'              , false)
     regSetBool('spears.rain'                    , false)
     regSetBool('spears.throwFlat'               , false)
+    regSetBool('spears.tipLight'                , true)
     regSetBool('spears.hitMarker'               , false)
     regSetBool('spears.yeetMode'                , false)
 

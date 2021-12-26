@@ -17,11 +17,14 @@ end
 
 function tick()
 
+    isUsingTool = GetString('game.player.tool') == 'pipebomb'
+
     processInput()
     updateSpears()
 
     convertPipebombs()
     processSpears()
+    processSpearMode()
 
     debugMod()
 
@@ -29,14 +32,18 @@ end
 
 function draw()
 
-    do UiPush()
-        uiManageGameOptions()
-    UiPop() end
+    if isUsingTool then
+        do UiPush()
+            uiManageGameOptions()
+        UiPop() end
 
-    do UiPush()
-        drawSpearQuickOptions()
-    UiPop() end
+        do UiPush()
+            drawSpearQuickOptions()
+        UiPop() end
 
-    drawToolText()
+        do UiPush()
+            drawToolText()
+        UiPop() end
+    end
 
 end

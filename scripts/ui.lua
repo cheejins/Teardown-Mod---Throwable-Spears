@@ -26,7 +26,6 @@ function uiDrawOptions()
 
         marginYSize = 80
         local marginY = 0
-
         UiTranslate(0, cont_marginY)
 
         do UiPush()
@@ -53,24 +52,80 @@ function uiDrawOptions()
 
         do UiPush()
 
-            UiTranslate(UiCenter()-330, 0)
+            UiTranslate(UiCenter()-270, 0)
 
             do UiPush()
 
                 UiTranslate(-250, 10)
 
+                do UiPush()
+
+                    UiFont('regular.ttf', 24)
+                    UiText('Throw Mode: ')
+                    UiTranslate(-142, 60)
+
+                    UiColor(0.75,0.75,0.75, 1)
+                    UiAlign('center middle')
+
+                    local btnW = 120
+                    local btnH = 50
+                    local btnSpacing = btnW + 20
+
+                    UiTranslate(btnSpacing, 0)
+                    do UiPush()
+                        if SPEARS.mode == SPEARS.modes.straight then
+                            UiColor(0,1,0, 1)
+                            UiFont('bold.ttf', 26)
+                        end
+                        UiButtonImageBox("ui/common/box-outline-fill-6.png", 10,10)
+                        if UiTextButton('Forward', btnW, btnH) then
+                            SPEARS.mode = SPEARS.modes.straight
+                        end
+                    UiPop() end
+
+                    UiTranslate(btnSpacing, 0)
+                    do UiPush()
+                        if SPEARS.mode == SPEARS.modes.flat then
+                            UiColor(0,1,0, 1)
+                            UiFont('bold.ttf', 26)
+                        end
+                        UiButtonImageBox("ui/common/box-outline-fill-6.png", 10,10)
+                        if UiTextButton('Flat', btnW, btnH) then
+                            SPEARS.mode = SPEARS.modes.flat
+                        end
+                    UiPop() end
+
+                    UiTranslate(btnSpacing, 0)
+                    do UiPush()
+                        if SPEARS.mode == SPEARS.modes.rain then
+                            UiColor(0,1,0, 1)
+                            UiFont('bold.ttf', 26)
+                        end
+                        UiButtonImageBox("ui/common/box-outline-fill-6.png", 10,10)
+                        if UiTextButton('Rain', btnW, btnH) then
+                            SPEARS.mode = SPEARS.modes.rain
+                        end
+                    UiPop() end
+
+                UiPop() end
+
+                UiTranslate(-64, marginYSize)
+                marginY = marginY + marginYSize
+                UiTranslate(0, marginYSize)
+                marginY = marginY + marginYSize
+
                 -- Velocity
-                ui.slider.create('Velocity', 'spears.velocity', 'm/s', 1, SPEARS.velocityMax)
+                ui.slider.create('Speed', 'spears.velocity', 'm/s', 1, SPEARS.velocityMax)
                 UiTranslate(0, marginYSize)
                 marginY = marginY + marginYSize
 
                 -- Velocity Max
-                ui.slider.create('Max Velocity', 'spears.velocityMax', 'm/s', 0, 500)
+                ui.slider.create('Max Speed', 'spears.velocityMax', 'm/s', 0, 500)
                 UiTranslate(0, marginYSize)
                 marginY = marginY + marginYSize
 
                 -- Force Multiplier
-                ui.slider.create('Force Multiplier', 'spears.forceMultiplier', '', 0, SPEARS.forceMultiplierMax)
+                ui.slider.create('Force Multiplier', 'spears.forceMultiplier', 'x', 0, SPEARS.forceMultiplierMax)
                 UiTranslate(0, marginYSize)
                 marginY = marginY + marginYSize
 
@@ -90,7 +145,7 @@ function uiDrawOptions()
 
         do UiPush()
 
-            UiTranslate(UiCenter()+360, 0)
+            UiTranslate(UiCenter()+300, 0)
 
             do UiPush()
 
@@ -102,13 +157,17 @@ function uiDrawOptions()
                     UiTranslate(0, marginYSize)
                     marginY = marginY + marginYSize
 
-                    ui.checkBox.create('Spears Collisions', 'spears.collisions')
+                    ui.checkBox.create('Colliding Spears', 'spears.collisions')
                     UiTranslate(0, marginYSize)
                     marginY = marginY + marginYSize
 
-                    ui.checkBox.create('Spear Rain', 'spears.rain')
-                    UiTranslate(0, marginYSize)
-                    marginY = marginY + marginYSize
+                    -- ui.checkBox.create('Spear Rain', 'spears.rain')
+                    -- UiTranslate(0, marginYSize)
+                    -- marginY = marginY + marginYSize
+
+                    -- ui.checkBox.create('Throw Spears Flat', 'spears.throwFlat')
+                    -- UiTranslate(0, marginYSize)
+                    -- marginY = marginY + marginYSize
 
                 UiPop() end
 
@@ -117,7 +176,7 @@ function uiDrawOptions()
 
                     UiTranslate(50, 0)
 
-                    ui.checkBox.create('Throw Spears Flat', 'spears.throwFlat')
+                    ui.checkBox.create('Spear Tip Light', 'spears.tipLight')
                     UiTranslate(0, marginYSize)
                     marginY = marginY + marginYSize
 
@@ -142,6 +201,7 @@ function uiDrawOptions()
             local wAlign = (resetW + closeW) / 2
 
             UiTranslate(UiCenter()-wAlign, cont_h - cont_marginY - 150)
+            -- UiTranslate(UiCenter(), cont_h - cont_marginY - 150)
 
             UiAlign('center middle')
             UiImageBox("ui/common/box-outline-fill-6.png", closeW, 50, 10, 10)
@@ -150,6 +210,7 @@ function uiDrawOptions()
             end
 
             UiTranslate(resetW/2 + closeW/2 + 10, 0)
+            -- UiTranslate(0, -60)
 
             UiImageBox("ui/common/box-outline-fill-6.png", resetW, 50, 10, 10)
             if UiTextButton('Reset Spear') then
@@ -191,6 +252,11 @@ function drawSpearQuickOptions()
             UiRect(1000, 400)
         UiPop() end
 
+        do UiPush()
+            UiColor(1,1,1, 1)
+            UiImageBox('MOD/img/mouse_lmb.png', 100,100, 1,1)
+        UiPop() end
+
         UiTranslate(-250, 0)
 
         -- Spear velocity
@@ -200,7 +266,7 @@ function drawSpearQuickOptions()
             local velocityFactor = SPEARS.velocityMax/gtZero(SPEARS.velocity)
 
             UiTranslate(UiCenter(), UiMiddle())
-            UiText('Velocity')
+            UiText('Speed')
 
             UiFont('bold.ttf', 48)
             UiTranslate(0, 48)
@@ -295,15 +361,43 @@ function drawToolText()
 
     UiTranslate(UiCenter(), UiHeight())
 
-    UiColor(0.75,0.75,0.75, 1)
+    UiColor(1,1,1, 0.4)
     UiFont('bold.ttf', 24)
     UiAlign('center middle')
 
     UiTranslate(0, -56)
+    UiTextShadow(0,0,0, 0.2, 2, 0)
     UiText('Press "o" to show all options.')
 
     UiTranslate(0, -30)
     UiText('Hold "right click" to show quick options.')
+
+    UiFont('bold.ttf', 32)
+
+    if not UI_OPTIONS then
+
+        UiTranslate(0, -120)
+        UiAlign('left middle')
+        do UiPush()
+            -- UiColor(1,1,1, 1)
+            -- UiFont('bold.ttf', 48)
+            UiText(sfn(SPEARS.forceMultiplier,1)*100 .. '%')
+        UiPop() end
+        UiAlign('right middle')
+        UiText('Force:   ')
+
+        UiTranslate(0, -40)
+        UiAlign('left middle')
+        do UiPush()
+            -- UiColor(1,1,1, 1)
+            -- UiFont('bold.ttf', 48)
+            UiText(sfn(SPEARS.velocity,0) .. ' m/s')
+        UiPop() end
+        UiAlign('right middle')
+        UiText('Speed:   ')
+
+    end
+
 
 end
 
