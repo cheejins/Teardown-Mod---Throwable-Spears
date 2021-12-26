@@ -7,6 +7,8 @@ function modReset()
 
     regSetFloat('spears.sharpness'          ,20)
     regSetFloat('spears.forceMultiplier'    ,1)
+    regSetFloat('spears.forceMultiplierMax' ,10)
+
     regSetFloat('spears.extraThrowHeight'   ,0)
 
     regSetBool('spears.impaling'    , true)

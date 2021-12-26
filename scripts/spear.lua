@@ -22,6 +22,9 @@ function updateSpears()
     SPEARS.holeSize = 0.3 -- (spear sharpness)
     SPEARS.holeDepth = 2 -- (spear sharpness)
 
+    SPEARS.forceMultiplier = regGetFloat('spears.forceMultiplier')
+    SPEARS.forceMultiplierMax = regGetFloat('spears.forceMultiplierMax')
+
     SPEARS.unbreakable = true
     -- SPEARS.overheadThrow = regGetBool('spears.overheadThrow')
 
@@ -43,11 +46,9 @@ do
             local tipPos = TransformToParentPoint(tr, Vec(0, 0, -y-1))
             spear.tipPos = tipPos
 
-
-            if SPEARS.impaling and spear.impaling.impales < spear.impaling.impaleTicks then
+            if spear.impaling.impales < spear.impaling.impaleTicks then
 
                 processSpearForce(spear, tipPos)
-
                 processSpearSharpness(tr, x,y,z)
 
             end
@@ -62,8 +63,6 @@ do
 
         for key, shape in pairs(pipebombs) do
 
-            local body = GetShapeBody(shape)
-
             -- if GetShapeVoxelCount(shape) == 21 then
                 RemoveTag(shape,'bomb')
                 RemoveTag(shape,'smoke')
@@ -72,9 +71,11 @@ do
 
             -- end
 
+            local body = GetShapeBody(shape)
             local bodyTrSpear = TransformCopy(GetCameraTransform())
             bodyTrSpear.pos = TransformToParentPoint(bodyTrSpear, Vec(0,0,-3))
             setSpearSpawn(body, bodyTrSpear)
+
 
             local spear = {
 
@@ -98,20 +99,16 @@ do
 
     end
 
-    function impaleSpear(spear, body)
+    function applySpearForce(spear, body)
 
         local spearVel = GetBodyVelocity(spear.body)
 
         local spearImpulse = VecScale(spearVel, GetBodyMass(spear.body)/GetBodyMass(body))
-        local spearImpulse = VecScale(spearImpulse, 2)
+        local spearImpulse = VecScale(spearImpulse, SPEARS.forceMultiplier)
 
         -- ApplyBodyImpulse(body, spear.tipPos, spearImpulse)
         SetBodyVelocity(body, spearImpulse)
 
-    end
-
-    -- Process the hit of an impalement.
-    function impaleSpearHit(spear)
     end
 
     function processSpearSharpness(tr, x,y,z)
@@ -146,7 +143,7 @@ do
             if body ~= GlobalBody then
                 aabbColor = Vec(1,0,0)
                 DrawBodyOutline(body, 1,0,0,1)
-                impaleSpear(spear, body) -- Impale bodies at the tip of the spear.
+                applySpearForce(spear, body) -- Impale bodies at the tip of the spear.
             end
 
         end
@@ -223,7 +220,17 @@ do
 
         --> Toggle options UI.
         if InputDown('rmb') and isUsingTool then
-            processVelocityCharging()
+
+            drawingSpearForce = true
+
+            local dx = InputValue('mousedx')/5
+            regSetFloat('spears.velocity', clamp(SPEARS.velocity + dx, 0, SPEARS.velocityMax))
+
+            local dy = InputValue('mousedy')/10
+            regSetFloat('spears.forceMultiplier', clamp(SPEARS.forceMultiplier + dy, 0, SPEARS.forceMultiplierMax))
+
+        else
+            drawingSpearForce = false
         end
 
     end

@@ -29,4 +29,5 @@ end
 
 function draw()
     uiManageGameOptions()
+    drawSpearForce()
 end

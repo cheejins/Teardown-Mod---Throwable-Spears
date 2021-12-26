@@ -170,6 +170,107 @@ end
 
 
 
+function drawSpearForce()
+    if drawingSpearForce then
+
+        UiMakeInteractive()
+
+        UiColor(1,1,1, 1)
+        UiFont('bold.ttf', 36)
+        UiAlign('center middle')
+
+        UiTranslate(-250, 0)
+
+        -- Spear velocity
+        do UiPush()
+
+            local sliderWidth = 400
+            local velocityFactor = SPEARS.velocityMax/gtZero(SPEARS.velocity)
+
+            UiTranslate(UiCenter(), UiMiddle())
+            UiText('Velocity')
+
+            UiFont('bold.ttf', 48)
+            UiTranslate(0, 48)
+            UiText(sfn(SPEARS.velocity))
+
+            UiAlign('left middle')
+            UiTranslate(-sliderWidth/2, 48)
+
+            UiColor(0,0,0, 1)
+            UiRect(sliderWidth, 36)
+
+            UiColor(1, 1 - 1/velocityFactor, 1 - 1/velocityFactor, 1)
+            UiRect(sliderWidth / velocityFactor, 28)
+
+            -- Mouse image
+            do UiPush()
+                UiAlign('center middle')
+                UiColor(1,1,1, 1)
+                UiTranslate(sliderWidth/2, 96)
+                UiImageBox('MOD/img/mouse.png', 100,100, 1,1)
+
+                do UiPush()
+                    UiTranslate(100, 0)
+                    UiImageBox('MOD/img/arrow_right.png', 100,100, 1,1)
+                UiPop() end
+                do UiPush()
+                    UiTranslate(-100, 0)
+                    UiImageBox('MOD/img/arrow_left.png', 100,100, 1,1)
+                UiPop() end
+
+            UiPop() end
+
+        UiPop() end
+
+        UiTranslate(500, 0)
+
+        -- Spear force
+        do UiPush()
+
+            local sliderWidth = 400
+            local forceFactor = SPEARS.forceMultiplierMax/gtZero(SPEARS.forceMultiplier)
+
+            UiTranslate(UiCenter(), UiMiddle())
+            UiText('Force Multiplier')
+
+            UiFont('bold.ttf', 48)
+            UiTranslate(0, 48)
+            UiText(sfn(SPEARS.forceMultiplier))
+
+            UiAlign('left middle')
+            UiTranslate(-sliderWidth/2, 48)
+
+            UiColor(0,0,0, 1)
+            UiRect(sliderWidth, 36)
+
+            UiColor(1, 1 - 1/forceFactor, 1 - 1/forceFactor, 1)
+            -- UiRect(sliderWidth / forceFactor, 28)
+
+            -- Mouse image
+            do UiPush()
+                UiAlign('center middle')
+                UiColor(1,1,1, 1)
+                UiTranslate(sliderWidth/2, 96)
+                UiImageBox('MOD/img/mouse.png', 100,100, 1,1)
+
+                do UiPush()
+                    UiTranslate(100, 0)
+                    UiImageBox('MOD/img/arrow_right.png', 100,100, 1,1)
+                UiPop() end
+                do UiPush()
+                    UiTranslate(-100, 0)
+                    UiImageBox('MOD/img/arrow_left.png', 100,100, 1,1)
+                UiPop() end
+
+            UiPop() end
+
+        UiPop() end
+
+    end
+end
+
+
 ui = {}
 
 ui.colors = {
