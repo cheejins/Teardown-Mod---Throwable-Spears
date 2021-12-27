@@ -1,6 +1,6 @@
-name = Impaling Spear
+name = Throwable Spears
 author = Cheejins
-description = [noupload]
+description = [noupload] A script that modifies the thrown pipebombs to make them into giant spears. Thanks to Thomanguus throwable brick script which I used as a base for this mod.
 tags = Tool
 
 # Available tags (comma-separated):

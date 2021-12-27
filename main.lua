@@ -8,6 +8,7 @@
 function init()
 
     GlobalBody = FindBodies('', true)[1]
+    SetBool('game.tool.pipebomb.enabled', true)
 
     checkRegInitialized()
     initUi()
