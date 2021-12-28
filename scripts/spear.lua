@@ -200,7 +200,8 @@ function convertPipebombs()
         end
 
         if SPEARS.throwFlat and hit then
-            bodyTrSpear.pos = Vec(playerTr.pos[1], hitPos[2], playerTr.pos[3])
+            local throwPos = TransformToParentPoint(playerTr, Vec(0,0,-1))
+            bodyTrSpear.pos = Vec(throwPos[1], hitPos[2], throwPos[3])
             bodyTrSpear.rot = QuatLookAt(bodyTrSpear.pos, hitPos)
         end
 

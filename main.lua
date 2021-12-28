@@ -25,7 +25,10 @@ function tick()
     processInput()
     updateSpears()
 
-    convertPipebombs()
+    if isUsingTool then
+        convertPipebombs()
+    end
+
     processSpears()
     processSpearMode()
 
@@ -36,6 +39,7 @@ end
 function draw()
 
     if isUsingTool then
+
         do UiPush()
             uiManageGameOptions()
         UiPop() end
@@ -47,6 +51,7 @@ function draw()
         do UiPush()
             drawToolText()
         UiPop() end
+
     end
 
 end
