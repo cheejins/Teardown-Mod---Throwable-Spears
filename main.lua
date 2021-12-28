@@ -25,9 +25,9 @@ function tick()
     processInput()
     updateSpears()
 
-    if isUsingTool then
+    -- if isUsingTool then
         convertPipebombs()
-    end
+    -- end
 
     processSpears()
     processSpearMode()
