@@ -22,6 +22,11 @@
         local subtractedPos = VecScale(VecNormalize(VecSub(endPos, startPos)), speed)
         return VecAdd(startPos, subtractedPos)
     end
+    function VecMult(vec1, vec2)
+        local vec = Vec(0,0,0)
+        for i = 1, 3 do vec[i] = vec1[i] * vec2[i] end
+        return vec
+    end
 
 
 --[[QUAT]]

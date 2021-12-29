@@ -1,3 +1,5 @@
+-- This whole UI code is a mess.
+
 function initUi()
 
     UI_OPTIONS = false
@@ -14,10 +16,11 @@ function uiDrawOptions()
     local w = UiWidth()
     local h = UiHeight()
 
-    local cont_w = 1100
-    local cont_h = 800
-    local cont_marginY = 100
+    local cont_w = 1300
+    local cont_h = 900
+    local cont_marginY = 50
 
+    -- Main container
     do UiPush()
 
         UiColor(1,1,1, 1)
@@ -28,19 +31,19 @@ function uiDrawOptions()
         local marginY = 0
         UiTranslate(0, cont_marginY)
 
+        -- Background
         do UiPush()
             UiTranslate(UiCenter(), 0)
             UiAlign('center top')
             UiColor(0,0,0, 0.75)
             UiRect(cont_w, cont_h)
 
-            if InputDown('lmb') and not UiIsMouseInRect(cont_w, cont_h) then
-                UI_OPTIONS = not UI_OPTIONS
-            end
-
-
+            -- if InputDown('lmb') and not UiIsMouseInRect(cont_w, cont_h) then
+            --     UI_OPTIONS = not UI_OPTIONS
+            -- end
         UiPop() end
 
+        -- Title
         do UiPush()
             UiTranslate(UiCenter(), 32)
             UiAlign('center top')
@@ -48,8 +51,9 @@ function uiDrawOptions()
             UiText('Spear Options')
         UiPop() end
 
-        UiTranslate(180, 180)
+        UiTranslate(20, 180)
 
+        -- Sliders
         do UiPush()
 
             UiTranslate(UiCenter()-270, 0)
@@ -120,12 +124,17 @@ function uiDrawOptions()
                 marginY = marginY + marginYSize
 
                 -- Velocity Max
-                ui.slider.create('Max Speed', 'spears.velocityMax', 'm/s', 0, 500)
+                ui.slider.create('Max Speed', 'spears.velocityMax', 'm/s', 0, 300)
                 UiTranslate(0, marginYSize)
                 marginY = marginY + marginYSize
 
                 -- Force Multiplier
                 ui.slider.create('Force Multiplier', 'spears.forceMultiplier', 'x', 0, SPEARS.forceMultiplierMax)
+                UiTranslate(0, marginYSize)
+                marginY = marginY + marginYSize
+
+                -- Force Multiplier
+                ui.slider.create('Stiffness', 'spears.stiffness', '%', 0, 100)
                 UiTranslate(0, marginYSize)
                 marginY = marginY + marginYSize
 
@@ -138,9 +147,10 @@ function uiDrawOptions()
 
         UiPop() end
 
+        -- Toggle switches
         do UiPush()
 
-            UiTranslate(UiCenter()+300, 0)
+            UiTranslate(UiCenter()+300, 25)
 
             do UiPush()
 
@@ -156,7 +166,7 @@ function uiDrawOptions()
                     UiTranslate(0, marginYSize)
                     marginY = marginY + marginYSize
 
-                    ui.checkBox.create('Spear Tip Light', 'spears.tipLight')
+                    ui.checkBox.create('Spear Hit Indicator', 'spears.hitIndicator')
                     UiTranslate(0, marginYSize)
                     marginY = marginY + marginYSize
 
@@ -193,8 +203,62 @@ function uiDrawOptions()
 
         UiPop() end
 
+        -- Presets
+        do UiPush()
+
+            UiTranslate(1300, 0)
+
+            local btnW = 200
+            local btnH = 50
+
+            UiAlign('left top')
+            UiFont('regular.ttf', 24)
+
+            UiText('Spear Presets')
+            UiTranslate(0, 48)
+
+            UiTranslate(btnW/2, btnH/2)
+
+            do UiPush()
+                UiAlign('center middle')
+                UiButtonImageBox("ui/common/box-outline-fill-6.png", 10,10)
+                if UiTextButton('Super Penetrator', btnW, btnH) then
+                    setPreset_superPenetrator()
+                end
+            UiPop() end
+            UiTranslate(0, btnH*1.2)
+
+            do UiPush()
+                UiAlign('center middle')
+                UiButtonImageBox("ui/common/box-outline-fill-6.png", 10,10)
+                if UiTextButton('Blunt Tip', btnW, btnH) then
+                    setPreset_blunt()
+                end
+            UiPop() end
+            UiTranslate(0, btnH*1.2)
+
+            do UiPush()
+                UiAlign('center middle')
+                UiButtonImageBox("ui/common/box-outline-fill-6.png", 10,10)
+                if UiTextButton('Sharp Tip', btnW, btnH) then
+                    setPreset_sharp()
+                end
+            UiPop() end
+            UiTranslate(0, btnH*1.2)
+
+            do UiPush()
+                UiAlign('center middle')
+                UiButtonImageBox("ui/common/box-outline-fill-6.png", 10,10)
+                if UiTextButton('(More Coming Soon)', btnW, btnH) then
+                end
+            UiPop() end
+            UiTranslate(0, btnH*1.2)
+
+        UiPop() end
+
     UiPop() end
 
+    -- Close/Reset buttons
     do UiPush()
 
         UiColor(1,1,1, 1)
@@ -207,7 +271,7 @@ function uiDrawOptions()
 
         -- UiTranslate(UiCenter()-wAlign, cont_h - cont_marginY - 150)
 
-        UiTranslate(-100, 0)
+        UiTranslate(-100, cont_marginY)
 
         UiTranslate(UiCenter(), 850)
         UiAlign('center middle')
@@ -226,7 +290,7 @@ function uiDrawOptions()
 
 end
 
-
+--- Quick options screen
 function drawSpearQuickOptions()
     if drawingSpearQuickOptions then
 
@@ -372,7 +436,7 @@ function drawSpearQuickOptions()
     end
 end
 
-
+--- Text above the tool name.
 function drawToolText()
 
     UiTranslate(UiCenter(), UiHeight())

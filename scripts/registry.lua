@@ -1,20 +1,22 @@
 function modReset()
 
-    regSetFloat('spears.velocity'           ,80)
-    regSetFloat('spears.velocityMax'        ,150)
+    regSetFloat('spears.velocity'           ,70)
+    regSetFloat('spears.velocityMax'        ,300)
 
     regSetFloat('spears.forceMultiplier'    ,1)
-    regSetFloat('spears.forceMultiplierMax' ,20)
+    regSetFloat('spears.forceMultiplierMax' ,30)
 
-    regSetFloat('spears.sharpness'          ,50)
+    regSetFloat('spears.stiffness'          ,0)
+
+    regSetFloat('spears.sharpness'          ,0)
     regSetFloat('spears.extraThrowHeight'   ,0)
 
     regSetBool('spears.unbreakableSpears'       , false)
-    regSetBool('spears.collisions'              , false)
+    regSetBool('spears.collisions'              , true)
     regSetBool('spears.rain'                    , false)
     regSetBool('spears.throwFlat'               , false)
     regSetBool('spears.tipLight'                , false)
-    regSetBool('spears.hitMarker'               , false)
+    regSetBool('spears.hitIndicator'            , false)
     regSetBool('spears.yeetMode'                , false)
 
 end
@@ -43,4 +45,26 @@ end
 function regSetBool(path, value)
     local p = 'savegame.mod.' .. path
     SetBool(p, value)
+end
+
+function setPreset_superPenetrator()
+    SPEARS.mode = SPEARS.modes.flat
+    regSetFloat('spears.velocity'               ,300)
+    regSetFloat('spears.velocityMax'            ,300)
+    regSetFloat('spears.forceMultiplier'        ,0)
+    regSetFloat('spears.stiffness'    ,100)
+
+    regSetBool('spears.unbreakableSpears'       ,true)
+    regSetBool('spears.hitIndicator'            ,true)
+
+end
+
+function setPreset_blunt()
+    regSetFloat('spears.stiffness'    ,0)
+    regSetFloat('spears.sharpness'              ,0)
+end
+
+function setPreset_sharp()
+    regSetFloat('spears.stiffness'    ,100)
+    regSetFloat('spears.sharpness'              ,100)
 end

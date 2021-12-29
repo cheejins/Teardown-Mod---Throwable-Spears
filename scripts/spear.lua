@@ -26,21 +26,9 @@ function processSpears()
         local tipPos = TransformToParentPoint(tr, Vec(0, 0, -y-1.7))
         spear.tipPos = tipPos
 
-        if spear.impaling.impales < spear.impaling.impaleTicks then
-
-            processSpearTip(spear, tipPos)
-
-            if spear.impaling.impaled then
-                spear.impaling.impales = spear.impaling.impales + 1 -- Increment number of ticks impaled so far.
-            end
-
-            applySpearSharpness(tr, x,y,z)
-
-        end
-
-        if SPEARS.tipLight then
-            PointLight(tipPos, 1,1,1, 2)
-        end
+        processSpearTip(spear, tipPos)
+        applySpearSharpness(spear, x,y,z)
+        applySpearPenetration(spear)
 
     end
 
@@ -57,10 +45,8 @@ function updateSpears()
     SPEARS.forceMultiplier = regGetFloat('spears.forceMultiplier')
     SPEARS.forceMultiplierMax = regGetFloat('spears.forceMultiplierMax')
 
+    SPEARS.stiffness = regGetFloat('spears.stiffness')
     SPEARS.sharpness = regGetFloat('spears.sharpness')/100
-    -- SPEARS.sharpness = 1
-    SPEARS.holeSize = 0.2 + (0.5*SPEARS.sharpness) -- (spear sharpness)
-    SPEARS.holeDepth = 3 * SPEARS.sharpness -- (spear sharpness)
 
     SPEARS.extraThrowHeight = regGetFloat('spears.extraThrowHeight')
 
@@ -72,7 +58,7 @@ function updateSpears()
     SPEARS.throwFlat = regGetBool('spears.throwFlat')
     SPEARS.hitMarker = regGetBool('spears.hitMarker')
     SPEARS.yeetMode = regGetBool('spears.yeetMode')
-    SPEARS.tipLight = regGetBool('spears.tipLight')
+    SPEARS.hitIndicator = regGetBool('spears.hitIndicator')
 
 end
 
@@ -88,17 +74,38 @@ function applySpearForce(spear, body)
 
 end
 
-function applySpearSharpness(tr, x,y,z)
+function applySpearSharpness(spear, x,y,z)
 
-    local shapnessDepth = SPEARS.holeDepth
-    local shapnessSize = SPEARS.holeSize
+    local spearTr = GetShapeWorldTransform(spear.shape)
 
-    for i = 1, shapnessDepth, shapnessSize  do
+    local forwardVel = TransformToLocalVec(spearTr, GetBodyVelocity(spear.body))[3] * -1
+    forwardVel = clamp(forwardVel, 0, math.huge) * SPEARS.sharpness
+    forwardVel = forwardVel / 2 -- scale
+    dbw('forwardVel', forwardVel)
+
+    local addTipFowardPos = clamp(forwardVel / 10, 0, 2)
+    spearTr.pos = TransformToParentPoint(spearTr, Vec(x/20, y/20, -addTipFowardPos)) -- Center of spear.
+
+    local shapnessDepth = clamp(forwardVel * SPEARS.sharpness, 0.3, 2)
+    -- local shapnessDepth = 1
+    local holeSize = 0.3
+
+    for i = 1, shapnessDepth, 0.1  do
         local shapnessDepthIncrement = shapnessDepth - i
-        local holePos = TransformToParentPoint(tr, Vec(0, 0, -y-1.9+shapnessDepthIncrement))
-        MakeHole(holePos, shapnessSize, shapnessSize, shapnessSize, shapnessSize)
+        local holePos = TransformToParentPoint(spearTr, Vec(0, 0, shapnessDepthIncrement))
+        MakeHole(holePos, holeSize, holeSize, holeSize, holeSize)
         dbcr(holePos, 1,1,1, 1)
     end
+
+end
+
+function applySpearPenetration(spear)
+
+    local p = (100 - SPEARS.stiffness) / 100
+    local angVel = GetBodyAngularVelocity(spear.body)
+    local spearAngVelNew = VecMult(angVel, Vec(p,p,p)) -- Scale angular velocity.
+
+    SetBodyAngularVelocity(spear.body, spearAngVelNew)
 
 end
 
@@ -127,7 +134,7 @@ function processSpearTip(spear, tipPos)
 
             if body ~= GlobalBody then
                 aabbColor = Vec(1,0,0)
-                if db then
+                if SPEARS.hitIndicator then
                     DrawBodyOutline(body, 1,0,0,1)
                 end
                 applySpearForce(spear, body) -- Impale bodies at the tip of the spear.
@@ -144,7 +151,7 @@ function processSpearTip(spear, tipPos)
 
     end
 
-    if db then
+    if SPEARS.hitIndicator then
         AabbDraw(tipMin, tipMax, aabbColor[1], aabbColor[2], aabbColor[3]) -- Draw spear tip aabb.
     end
 
@@ -156,6 +163,67 @@ function setSpearSpawn(spearBody, tr, vel)
     SetBodyTransform(spearBody, tr)
     SetBodyVelocity(spearBody, VecScale(QuatToDir(QuatLookAt(tr.pos, TransformToParentPoint(tr, Vec(0,0,-1)))), SPEARS.velocity))
     SetBodyAngularVelocity(spearBody, Vec(0,0,0))
+end
+
+function setSpearDimensions(spear)
+
+    local spearTr = GetShapeWorldTransform(spear.shape)
+
+    if spear.dimensions == nil then
+
+        local sx, sy, sz = GetShapeSize(spear.shape)
+        spear.dimensions = {sx, sy, sz}
+
+        dbp('set spear dim')
+    end
+
+
+    if spear.sh == nil then
+
+        spear.sh = 1
+
+    end
+
+    -- if spear.sh < 10 then
+
+        local x, y, z = spear.dimensions[1], spear.dimensions[2], spear.dimensions[3]
+
+        dbp('spear.sh ' .. spear.sh)
+
+
+        for i = 0, z, 0.05 do
+            MakeHole(TransformToParentPoint(spearTr, Vec(0,0,i)), 0.05, 0.05, 0.05, 0.05)
+        end
+        dbl(spearTr.pos, TransformToParentPoint(spearTr, Vec(0, 0, z/10)), 1,1,1, 1)
+
+
+        local spearTrOffset = TransformCopy(spearTr)
+        spearTrOffset.pos = VecAdd(spearTrOffset.pos, Vec(x/10,0,0))
+        for i = 0, z, 0.05 do
+            MakeHole(TransformToParentPoint(spearTrOffset, Vec(0,0,i)), 0.05, 0.05, 0.05, 0.05)
+        end
+        dbl(spearTrOffset.pos, TransformToParentPoint(spearTrOffset, Vec(0, 0, z/10)), 1,1,1, 1)
+
+
+        local spearTrOffset = TransformCopy(spearTr)
+        spearTrOffset.pos = VecAdd(spearTrOffset.pos, Vec(x/10,y/10,0))
+        for i = 0, z, 0.05 do
+            MakeHole(TransformToParentPoint(spearTrOffset, Vec(0,0,i)), 0.05, 0.05, 0.05, 0.05)
+        end
+        dbl(spearTrOffset.pos, TransformToParentPoint(spearTrOffset, Vec(0, 0, z/10)), 1,1,1, 1)
+
+
+        local spearTrOffset = TransformCopy(spearTr)
+        spearTrOffset.pos = VecAdd(spearTrOffset.pos, Vec(0,y/10,0))
+        for i = 0, z, 0.05 do
+            MakeHole(TransformToParentPoint(spearTrOffset, Vec(0,0,i)), 0.05, 0.05, 0.05, 0.05)
+        end
+        dbl(spearTrOffset.pos, TransformToParentPoint(spearTrOffset, Vec(0, 0, z/10)), 1,1,1, 1)
+
+
+        -- spear.sh = spear.sh + 1
+    -- end
+
 end
 
 function convertPipebombs()
@@ -229,6 +297,8 @@ function convertPipebombs()
 
                 }
             }
+
+            -- setSpearDimensions(spear)
 
             table.insert(ActiveSpears, spear)
         end
