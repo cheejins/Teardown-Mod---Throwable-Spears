@@ -5,10 +5,14 @@
 #include "scripts/ui.lua"
 #include "scripts/utility.lua"
 
+version = '22-04-02'
+
 function init()
 
     GlobalBody = FindBodies('', true)[1]
-    SetBool('game.tool.pipebomb.enabled', true)
+
+    RegisterTool("throwableSpears", "Throwable Spear", "MOD/vox/tool.vox")
+    SetBool('game.tool.throwableSpears.enabled', true)
 
     checkRegInitialized()
     initUi()
@@ -20,14 +24,13 @@ end
 
 function tick()
 
-    isUsingTool = GetString('game.player.tool') == 'pipebomb'
+    isNotGrabbing = GetPlayerGrabBody() == 0 and GetPlayerGrabShape() == 0
+    isUsingTool = GetString('game.player.tool') == 'throwableSpears' and GetPlayerVehicle() == 0 and isNotGrabbing
 
     processInput()
     updateSpears()
 
-    -- if isUsingTool then
-        convertPipebombs()
-    -- end
+    convertSpawnedSpear()
 
     processSpears()
     processSpearMode()

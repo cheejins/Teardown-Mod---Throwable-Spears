@@ -439,6 +439,15 @@ end
 --- Text above the tool name.
 function drawToolText()
 
+    do UiPush()
+        UiTranslate(10,10)
+        UiColor(1,1,1, 0.3)
+        UiFont('bold.ttf', 20)
+        UiAlign('left top')
+        UiText('v.' .. version)
+    UiPop() end
+
+
     UiTranslate(UiCenter(), UiHeight())
 
     UiColor(1,1,1, 0.4)

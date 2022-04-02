@@ -1,6 +1,5 @@
 function initSpears()
 
-    SetString("game.tool.pipebomb.name", "Throwable Spear") -- Rename pipebomb
     ActiveSpears = {} -- Table of spear objects.
 
 
@@ -226,84 +225,81 @@ function setSpearDimensions(spear)
 
 end
 
-function convertPipebombs()
+function convertSpawnedSpear()
 
-    pipebombs = FindShapes('bomb', true)
+    if InputPressed('lmb') and isUsingTool and not drawingSpearQuickOptions and not UI_OPTIONS then
+        Spawn('MOD/prefab/spear.xml', Transform())
+        beep()
+    end
 
-    local playerTr = GetPlayerTransform()
+    spears = FindShapes('spawnedSpear', true)
 
-    for key, shape in pairs(pipebombs) do
+    for key, shape in pairs(spears) do
 
-        -- if GetShapeVoxelCount(shape) == 21 then
-        if HasTag(shape, 'bomb') and HasTag(shape, 'smoke') then
-            RemoveTag(shape,'bomb')
-            RemoveTag(shape,'smoke')
-
-            if SPEARS.unbreakableSpears then
-                SetTag(shape, 'unbreakable')
-            end
-
-            -- Set spear spawn
-            local body = GetShapeBody(shape)
-            local bodyTrSpear = TransformCopy(GetCameraTransform())
-            bodyTrSpear.pos = TransformToParentPoint(bodyTrSpear, Vec(0,0,-3))
-            local hit, hitPos, hitShape = RaycastFromTransform(GetCameraTransform(), 500)
-
-            if SPEARS.rain then
-
-                if hit then
-                    -- Top of hit shape
-                    local min, max = GetShapeBounds(hitShape)
-                    local maxY = min[2] + max[2]
-                    local spawnPos = VecAdd(hitPos, Vec(0, maxY + SPEARS.velocity, 0))
-
-                    local spawnRot = QuatLookDown(spawnPos)
-
-                    bodyTrSpear = Transform(spawnPos, spawnRot)
-
-                    PointLight(hitPos, 1,0,0, 2)
-                    DrawDot(hitPos, 0.25,0.25, 1,0,0, 1)
-                end
-
-            end
-
-            if SPEARS.throwFlat and hit then
-                local throwPos = TransformToParentPoint(playerTr, Vec(0,0,-1))
-                bodyTrSpear.pos = Vec(throwPos[1], hitPos[2], throwPos[3])
-                bodyTrSpear.rot = QuatLookAt(bodyTrSpear.pos, hitPos)
-            end
-
-            setSpearSpawn(body, bodyTrSpear)
-
-            -- Spear collisions
-            if not SPEARS.collisions then
-                SetShapeCollisionFilter(shape, 2, 255-2)
-            end
-
-            local spear = {
-
-                body = body,
-                shape = shape,
-
-                impaling = {
-
-                    impaled = false,
-                    impales = 0,
-                    -- impaleTicks = VecLength(GetBodyVelocity(body))/3, -- Impale for this many ticks after the tip hits an object.
-                    impaleTicks = 15, -- Impale for this many ticks after the tip hits an object.
-
-                    impaleBody = nil,
-                    impaleAttachBody = nil,
-
-                }
-            }
-
-            -- setSpearDimensions(spear)
-
-            table.insert(ActiveSpears, spear)
+        if SPEARS.unbreakableSpears then
+            SetTag(shape, 'unbreakable')
         end
 
+        -- Set spear spawn
+        local body = GetShapeBody(shape)
+        local bodyTrSpear = TransformCopy(GetCameraTransform())
+        bodyTrSpear.pos = TransformToParentPoint(bodyTrSpear, Vec(0,0,-3))
+        local hit, hitPos, hitShape = RaycastFromTransform(GetCameraTransform(), 500)
+
+        if SPEARS.rain then
+
+            if hit then
+                -- Top of hit shape
+                local min, max = GetShapeBounds(hitShape)
+                local maxY = min[2] + max[2]
+                local spawnPos = VecAdd(hitPos, Vec(0, maxY + SPEARS.velocity, 0))
+
+                local spawnRot = QuatLookDown(spawnPos)
+
+                bodyTrSpear = Transform(spawnPos, spawnRot)
+
+                PointLight(hitPos, 1,0,0, 2)
+                DrawDot(hitPos, 0.25,0.25, 1,0,0, 1)
+            end
+
+        end
+
+        if SPEARS.throwFlat and hit then
+            local throwPos = TransformToParentPoint(GetPlayerTransform(), Vec(0,0,-1))
+            bodyTrSpear.pos = Vec(throwPos[1], hitPos[2], throwPos[3])
+            bodyTrSpear.rot = QuatLookAt(bodyTrSpear.pos, hitPos)
+        end
+
+        setSpearSpawn(body, bodyTrSpear)
+
+        -- Spear collisions
+        if not SPEARS.collisions then
+            SetShapeCollisionFilter(shape, 2, 255-2)
+        end
+
+        local spear = {
+
+            body = body,
+            shape = shape,
+
+            impaling = {
+
+                impaled = false,
+                impales = 0,
+                -- impaleTicks = VecLength(GetBodyVelocity(body))/3, -- Impale for this many ticks after the tip hits an object.
+                impaleTicks = 15, -- Impale for this many ticks after the tip hits an object.
+
+                impaleBody = nil,
+                impaleAttachBody = nil,
+
+            }
+        }
+
+
+        RemoveTag(shape,'spawnedSpear')
+        table.insert(ActiveSpears, spear)
     end
+
 
 end
 

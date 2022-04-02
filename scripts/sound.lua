@@ -6,9 +6,6 @@ function initSounds()
             LoadSound("MOD/snd/yeet_swagger.ogg"),
             LoadSound("MOD/snd/yeet_sam.ogg"),
             LoadSound("MOD/snd/yeet_yeet.ogg"),
-            LoadSound("MOD/snd/yeet_yeet.ogg"),
-            LoadSound("MOD/snd/yeet_yeet.ogg"),
-            LoadSound("MOD/snd/yeet_yeet.ogg"),
         },
     }
 
